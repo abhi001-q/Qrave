@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Uploads / Generated PDFs
+uploads/bills/*.pdf
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output (Frontend)
+Frontend/dist/
+
+
