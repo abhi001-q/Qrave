@@ -17,4 +17,8 @@ Thumbs.db
 # Build output (Frontend)
 Frontend/dist/
 
-
+# Agent / workspace config
+.agents/
+skills-lock.json
+PROJECT_STATUS.md
+Qrave/
