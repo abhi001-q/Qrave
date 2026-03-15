@@ -59,6 +59,7 @@ export default function AdminLogin() {
               value={form.email}
               onChange={handleChange}
               placeholder="admin@qrave.com"
+              aria-label="Admin Email Address"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
           </div>
@@ -73,6 +74,7 @@ export default function AdminLogin() {
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
+              aria-label="Admin Password"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
           </div>

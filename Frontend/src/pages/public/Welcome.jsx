@@ -34,6 +34,7 @@ export default function Welcome() {
             </p>
             <Link 
               to="/menu"
+              aria-label="Continue to Add Dish"
               className="bg-[#4CAF50] text-white font-semibold text-xl py-3 px-8 rounded-lg w-full max-w-[280px] text-center shadow-sm hover:bg-[#43a047] transition-all"
             >
               Add Dish
@@ -59,6 +60,7 @@ export default function Welcome() {
             </p>
             <Link 
               to="/login"
+              aria-label="Continue to Manager Login"
               className="bg-[#4CAF50] text-white font-semibold text-xl py-3 px-8 rounded-lg w-full max-w-[280px] text-center shadow-sm hover:bg-[#43a047] transition-all"
             >
               Manager
