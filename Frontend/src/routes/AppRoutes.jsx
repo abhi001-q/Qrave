@@ -14,11 +14,13 @@ import RoleRoute      from './RoleRoute';
 import Home      from '../pages/public/Home';
 import Menu      from '../pages/public/Menu';
 import GuestCart from '../pages/public/GuestCart';
+import Welcome   from '../pages/public/Welcome';
 
 // Auth pages
 import Login          from '../pages/auth/Login';
-import Register       from '../pages/auth/Register';
+import AdminLogin     from '../pages/auth/AdminLogin';
 import ForgotPassword from '../pages/auth/ForgotPassword';
+import ResetPassword  from '../pages/auth/ResetPassword';
 
 // User pages
 import UserDashboard from '../pages/user/UserDashboard';
@@ -49,11 +51,13 @@ export default function AppRoutes() {
       {/* ── Public (guest + logged-in users) ── */}
       <Route element={<PublicLayout />}>
         <Route path="/"          element={<Home />} />
+        <Route path="/welcome"   element={<Welcome />} />
         <Route path="/menu"      element={<Menu />} />
         <Route path="/cart"      element={<GuestCart />} />
         <Route path="/login"     element={<Login />} />
-        <Route path="/register"  element={<Register />} />
-        <Route path="/forgot"    element={<ForgotPassword />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       {/* ── Logged-in User ── */}
