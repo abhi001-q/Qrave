@@ -105,6 +105,7 @@ export default function Login() {
               value={regForm.name}
               onChange={handleRegChange}
               placeholder="Full Name"
+              aria-label="Full Name"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
             <input
@@ -113,6 +114,7 @@ export default function Login() {
               value={regForm.email}
               onChange={handleRegChange}
               placeholder="Email"
+              aria-label="Email Address"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
             <input
@@ -121,6 +123,7 @@ export default function Login() {
               value={regForm.phone}
               onChange={handleRegChange}
               placeholder="Mobile Number"
+              aria-label="Mobile Number"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
             <input
@@ -129,6 +132,7 @@ export default function Login() {
               value={regForm.password}
               onChange={handleRegChange}
               placeholder="Password"
+              aria-label="Password"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
 
@@ -162,6 +166,7 @@ export default function Login() {
               value={loginForm.email}
               onChange={handleLoginChange}
               placeholder="Email"
+              aria-label="Email Address"
               className="w-full bg-white text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
             <input
@@ -170,6 +175,7 @@ export default function Login() {
               value={loginForm.password}
               onChange={handleLoginChange}
               placeholder="Password"
+              aria-label="Password"
               className="w-full bg-white text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
 

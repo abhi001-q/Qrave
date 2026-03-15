@@ -88,6 +88,7 @@ export default function ResetPassword() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="New Password"
+                aria-label="New Password"
                 className="w-full bg-white text-gray-800 rounded-lg pl-12 pr-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition border border-gray-300"
               />
             </div>
@@ -115,6 +116,7 @@ export default function ResetPassword() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
+                aria-label="Confirm Password"
                 className="w-full bg-white text-gray-800 rounded-lg pl-12 pr-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition border border-gray-300"
               />
             </div>

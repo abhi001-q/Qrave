@@ -90,6 +90,7 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
+                aria-label="Email Address"
                 disabled={otpSent}
                 className="w-full bg-white text-gray-800 rounded-lg pl-12 pr-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition border border-gray-300 disabled:opacity-50 disabled:bg-gray-50"
               />
@@ -105,6 +106,7 @@ export default function ForgotPassword() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="OTP"
+                aria-label="One Time Password"
                 disabled={!otpSent}
                 className="w-full bg-white text-gray-800 rounded-lg pl-12 pr-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition border border-gray-300 disabled:opacity-50 disabled:bg-gray-50"
               />
