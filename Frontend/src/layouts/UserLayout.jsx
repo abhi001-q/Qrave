@@ -11,10 +11,11 @@ export default function UserLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white flex">
-      {/* Sidebar */}
-      <aside className="w-56 border-r border-white/10 bg-[#111] p-4 flex flex-col gap-2 shrink-0">
-        <Link to="/" className="text-2xl font-bold mb-6">
+    /* ── Fixed desktop layout: sidebar + content, no responsive prefixes ── */
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }} className="bg-[#0f0f0f] text-white">
+      {/* Sidebar — fixed width, never shrinks */}
+      <aside style={{ width: "224px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "8px", padding: "16px", borderRight: "1px solid rgba(255,255,255,0.1)" }} className="bg-[#111]">
+        <Link to="/" style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "24px", display: "block" }}>
           <span className="text-orange-500">Q</span>rave
         </Link>
         <NavLink to="/dashboard">Dashboard</NavLink>
@@ -23,22 +24,25 @@ export default function UserLayout() {
         <NavLink to="/profile">Profile</NavLink>
         <NavLink to="/menu">Menu</NavLink>
 
-        <div className="mt-auto pt-4 border-t border-white/10">
-          <p className="text-xs text-white/40 mb-2">
+        <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>
             Signed in as <span className="text-orange-400">{user?.name}</span>
           </p>
           <button
             onClick={handleLogout}
-            className="text-sm text-red-400 hover:text-red-300 transition cursor-pointer"
+            style={{ fontSize: "14px", color: "#f87171", cursor: "pointer" }}
+            className="hover:text-red-300 transition"
           >
             Logout
           </button>
         </div>
       </aside>
 
-      {/* Content */}
-      <main className="flex-1 p-6 overflow-auto">
-        <Outlet />
+      {/* Content — fills remaining width, scrollable */}
+      <main style={{ flex: 1, minWidth: 0, padding: "24px", overflowY: "auto" }}>
+        <div className="page-content">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
@@ -48,7 +52,8 @@ function NavLink({ to, children }) {
   return (
     <Link
       to={to}
-      className="text-sm text-white/60 hover:text-white hover:bg-white/5 px-3 py-2 rounded-lg transition"
+      style={{ fontSize: "14px", padding: "8px 12px", borderRadius: "8px", display: "block" }}
+      className="text-white/60 hover:text-white hover:bg-white/5 transition"
     >
       {children}
     </Link>

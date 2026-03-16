@@ -14,7 +14,7 @@ import RoleRoute      from './RoleRoute';
 import Home      from '../pages/public/Home';
 import Menu      from '../pages/public/Menu';
 import GuestCart from '../pages/public/GuestCart';
-import Welcome   from '../pages/public/Welcome';
+
 
 // Auth pages
 import Login          from '../pages/auth/Login';
@@ -51,7 +51,7 @@ export default function AppRoutes() {
       {/* ── Public (guest + logged-in users) ── */}
       <Route element={<PublicLayout />}>
         <Route path="/"          element={<Home />} />
-        <Route path="/welcome"   element={<Welcome />} />
+
         <Route path="/menu"      element={<Menu />} />
         <Route path="/cart"      element={<GuestCart />} />
         <Route path="/login"     element={<Login />} />

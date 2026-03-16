@@ -7,17 +7,15 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Registration state
   const [regForm, setRegForm] = useState({
     name: "",
     email: "",
     phone: "",
     password: "",
-    role: "manager", // Default role since user directly goes to menu
+    role: "manager",
   });
   const [regLoading, setRegLoading] = useState(false);
 
-  // Login state
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -33,22 +31,15 @@ export default function Login() {
       toast.error("Name, email and password are required");
       return;
     }
-
     setRegLoading(true);
     try {
       const { authService } = await import("../../services/authService");
       const data = await authService.register(regForm);
-
-      // Auto-login after register
       localStorage.setItem("qrave_user", JSON.stringify(data.user));
       localStorage.setItem("qrave_token", data.token);
-
       toast.success(`Welcome, ${data.user.name}! Account created.`);
-
-      // Redirect based on role
       if (data.user.role === "manager") navigate("/manager");
       else navigate("/dashboard");
-
       window.location.reload();
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
@@ -63,14 +54,10 @@ export default function Login() {
       toast.error("Please fill all fields");
       return;
     }
-
     setLoginLoading(true);
     try {
       const user = await login(loginForm);
       toast.success(`Welcome back, ${user.name}!`);
-
-      // Redirect based on role
-      // Admin handles their own login route, but if admin logs in here by mistake, redirect them
       if (user.role === "admin") navigate("/admin");
       else if (user.role === "manager") navigate("/manager");
       else navigate("/dashboard");
@@ -82,15 +69,38 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row relative font-sans">
-      {/* Absolute OR Divider */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full w-12 h-12 flex flex-col items-center justify-center font-bold text-[#0FAF1A] shadow-md z-10 hidden md:flex border border-gray-100">
+    /* ── Fixed desktop layout: always side-by-side, no responsive prefixes ── */
+    <div
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "row", position: "relative" }}
+      className="bg-white font-sans"
+    >
+      {/* OR Divider — always visible at center */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 10,
+        }}
+        className="bg-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-[#0FAF1A] shadow-md border border-gray-100"
+      >
         OR
       </div>
 
-      {/* Left side: Register */}
-      <div className="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 lg:p-16 xl:p-24">
-        <div className="max-w-md w-full mx-auto">
+      {/* Left panel: Register */}
+      <div
+        style={{
+          width: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px",
+          borderRight: "1px solid #e5e7eb",
+        }}
+        className="bg-white"
+      >
+        <div style={{ width: "100%", maxWidth: "440px" }}>
           <h1 className="text-3xl font-bold mb-1 text-black">
             Welcome to <span className="text-[#0FAF1A]">Qrave</span>,
           </h1>
@@ -135,7 +145,6 @@ export default function Login() {
               aria-label="Password"
               className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
-
             <button
               type="submit"
               disabled={regLoading}
@@ -147,14 +156,18 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right side: Login */}
-      <div className="w-full md:w-1/2 bg-[#EBEBEB] flex flex-col justify-center p-8 lg:p-16 xl:p-24 relative border-t md:border-t-0 border-[#0FAF1A]/20">
-        {/* Mobile OR Divider */}
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex flex-col items-center justify-center font-bold text-[#0FAF1A] shadow-md z-10 md:hidden border border-gray-100 text-sm">
-          OR
-        </div>
-
-        <div className="max-w-md w-full mx-auto">
+      {/* Right panel: Login */}
+      <div
+        style={{
+          width: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px",
+        }}
+        className="bg-[#EBEBEB]"
+      >
+        <div style={{ width: "100%", maxWidth: "440px" }}>
           <h2 className="text-3xl font-bold mb-8 text-black">
             Login your account.
           </h2>
@@ -178,8 +191,7 @@ export default function Login() {
               aria-label="Password"
               className="w-full bg-white text-gray-800 rounded-lg px-5 py-4 text-base outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
             />
-
-            <div className="flex flex-col sm:flex-row gap-4 mt-2">
+            <div className="flex gap-4 mt-2">
               <button
                 type="submit"
                 disabled={loginLoading}

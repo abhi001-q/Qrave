@@ -30,6 +30,39 @@ const User = {
     );
     return rows;
   },
+
+  async setOTP(email, otp, expires) {
+    await pool.query(
+      "UPDATE users SET otp_code = ?, otp_expires = ? WHERE email = ?",
+      [otp, expires, email],
+    );
+  },
+
+  async verifyOTP(email, otp) {
+    const [rows] = await pool.query(
+      "SELECT otp_code, otp_expires FROM users WHERE email = ?",
+      [email],
+    );
+    if (!rows[0]) return false;
+    const { otp_code, otp_expires } = rows[0];
+    if (otp_code !== otp) return false;
+    if (new Date() > new Date(otp_expires)) return false;
+    return true;
+  },
+
+  async clearOTP(email) {
+    await pool.query(
+      "UPDATE users SET otp_code = NULL, otp_expires = NULL WHERE email = ?",
+      [email],
+    );
+  },
+
+  async updatePassword(email, hashedPassword) {
+    await pool.query("UPDATE users SET password = ? WHERE email = ?", [
+      hashedPassword,
+      email,
+    ]);
+  },
 };
 
 module.exports = User;

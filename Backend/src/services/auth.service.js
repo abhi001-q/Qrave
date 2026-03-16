@@ -70,6 +70,44 @@ const authService = {
 
     return { user: safeUser, token };
   },
+
+  // ── OTP Password Reset ─────────────────────────────
+  async forgotPassword(email) {
+    const user = await User.findByEmail(email);
+    if (!user) {
+      const err = new Error("User not found");
+      err.status = 404;
+      throw err;
+    }
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await User.setOTP(email, otp, expires);
+    // Send email
+    const sendEmail = require("../utils/sendEmail");
+    await sendEmail({
+      to: email,
+      subject: "Qrave Password Reset OTP",
+      text: `Your OTP is ${otp}. It expires in 10 minutes.`,
+      html: `<p>Your OTP is <b>${otp}</b>. It expires in 10 minutes.</p>`,
+    });
+  },
+
+  async verifyOtp(email, otp) {
+    return await User.verifyOTP(email, otp);
+  },
+
+  async resetPassword(email, otp, newPassword) {
+    const valid = await User.verifyOTP(email, otp);
+    if (!valid) {
+      const err = new Error("Invalid or expired OTP");
+      err.status = 400;
+      throw err;
+    }
+    const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await User.updatePassword(email, hashed);
+    await User.clearOTP(email);
+  },
 };
 
 module.exports = authService;

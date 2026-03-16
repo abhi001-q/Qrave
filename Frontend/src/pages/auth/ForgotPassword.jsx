@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import api from "../../services/api";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -15,15 +16,13 @@ export default function ForgotPassword() {
       toast.error("Please enter your email address");
       return;
     }
-
     setLoading(true);
     try {
-      // Simulate API call to send OTP
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await api.post("/auth/forgot-password", { email });
       setOtpSent(true);
       toast.success("OTP sent to your email!");
     } catch (error) {
-      toast.error("Failed to send OTP");
+      toast.error(error.response?.data?.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -34,44 +33,59 @@ export default function ForgotPassword() {
       toast.error("Please enter the OTP");
       return;
     }
-
     setLoading(true);
     try {
-      // Simulate OTP verification
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (otp === "123456" || otp.length === 6) {
-        // allow any 6 digit mock otp for now
-        toast.success("OTP verified!");
-        // Passing the email into state so the next page knows who to reset
-        navigate("/reset-password", { state: { email } });
-      } else {
-        toast.error("Invalid OTP. Please try again.");
-      }
+      await api.post("/auth/verify-otp", { email, otp });
+      toast.success("OTP verified!");
+      navigate("/reset-password", { state: { email, otp } });
     } catch (error) {
-      toast.error("Verification failed");
+      toast.error(
+        error.response?.data?.message || "Invalid OTP. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row relative font-sans">
+    /* ── Fixed desktop layout: no responsive breakpoints ── */
+    <div
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }}
+      className="bg-white font-sans"
+    >
       {/* Left Side: Illustration */}
-      <div className="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8 lg:p-16 border-b md:border-b-0 md:border-r border-gray-200">
-        <div className="w-full max-w-md h-auto aspect-square flex items-center justify-center">
-          {/* Placeholder for the sofa/keys illustration */}
+      <div
+        style={{
+          width: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px",
+          borderRight: "1px solid #e5e7eb",
+        }}
+        className="bg-white"
+      >
+        <div style={{ width: "100%", maxWidth: "400px", aspectRatio: "1/1" }}>
           <img
             src="https://illustrations.popsy.co/gray/surreal-hourglass.svg"
             alt="Forgot Password Illustration"
-            className="w-full h-full object-contain mix-blend-multiply opacity-90"
+            style={{ width: "100%", height: "100%", objectFit: "contain", mixBlendMode: "multiply", opacity: 0.9 }}
           />
         </div>
       </div>
 
       {/* Right Side: Form */}
-      <div className="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 lg:p-16 xl:p-24">
-        <div className="max-w-md w-full mx-auto">
+      <div
+        style={{
+          width: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px",
+        }}
+        className="bg-white"
+      >
+        <div style={{ width: "100%", maxWidth: "440px" }}>
           <h1 className="text-3xl font-bold mb-4 text-black">
             Forget Password
           </h1>
