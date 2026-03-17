@@ -1,8 +1,5 @@
+import React from "react";
+
 export default function TableBooking() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2">Book a Table</h1>
-      <p className="text-white/50">Coming soon.</p>
-    </div>
-  );
+  return <div>Table Booking</div>;
 }

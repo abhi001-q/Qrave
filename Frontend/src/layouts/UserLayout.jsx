@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
+
 export default function UserLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

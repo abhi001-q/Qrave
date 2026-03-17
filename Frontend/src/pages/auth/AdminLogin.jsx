@@ -42,7 +42,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-[#EBEBEB] flex items-center justify-center p-4 font-sans">
       <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-lg border border-gray-100">
         <h1 className="text-3xl font-bold text-center mb-2 text-black">
-          Qrave <span className="text-[#0FAF1A]">Admin</span>
+          Qrave <span className="text-[#F97316]">Admin</span>
         </h1>
         <p className="text-gray-500 text-center text-sm mb-8">
           Authorized personnel only
@@ -60,7 +60,7 @@ export default function AdminLogin() {
               onChange={handleChange}
               placeholder="admin@qrave.com"
               aria-label="Admin Email Address"
-              className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
+              className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#F97316] transition"
             />
           </div>
 
@@ -75,14 +75,14 @@ export default function AdminLogin() {
               onChange={handleChange}
               placeholder="••••••••"
               aria-label="Admin Password"
-              className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#0FAF1A] transition"
+              className="w-full bg-[#EBEBEB] text-gray-800 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#F97316] transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#0FAF1A] hover:bg-[#0c9616] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition mt-4 cursor-pointer shadow-sm"
+            className="w-full bg-[#F97316] hover:bg-[#F97316] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition mt-4 cursor-pointer shadow-sm"
           >
             {loading ? "Authenticating..." : "Login to Dashboard"}
           </button>

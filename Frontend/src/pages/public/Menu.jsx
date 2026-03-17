@@ -1,9 +1,11 @@
+import React from "react";
+
 export default function Menu() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-4">Menu</h1>
-      <p className="text-white/50">
-        Coming soon — menu items will appear here.
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Menu Page</h1>
+      <p className="text-slate-500 mt-2">
+        This is a placeholder for the Menu page.
       </p>
     </div>
   );
