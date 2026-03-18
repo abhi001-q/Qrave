@@ -13,6 +13,7 @@ import RoleRoute from "./RoleRoute";
 // Public pages
 import Home from "../pages/public/Home";
 import Menu from "../pages/public/Menu";
+import CartPage from "../pages/public/CartPage";
 
 // Auth pages
 import Login from "../pages/auth/Login";
@@ -36,13 +37,12 @@ import Categories from "../pages/manager/Categories";
 import Tables from "../pages/manager/Tables";
 import Orders from "../pages/manager/Orders";
 import BillSection from "../pages/manager/BillSection";
-import ManagerProfile from "../pages/manager/ManagerProfile";
 
 // Admin pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UserManagement from "../pages/admin/UserManagement";
-import ManagerApproval from "../pages/admin/ManagerApproval";
-import SystemStatus from "../pages/admin/SystemStatus";
+import ManagerApprovals from "../pages/admin/ManagerApprovals";
+import SystemHealth from "../pages/admin/SystemHealth";
 
 export default function AppRoutes() {
   return (
@@ -52,6 +52,7 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
 
         <Route path="/menu" element={<Menu />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -83,7 +84,7 @@ export default function AppRoutes() {
             <Route path="/manager/tables" element={<Tables />} />
             <Route path="/manager/orders" element={<Orders />} />
             <Route path="/manager/bills" element={<BillSection />} />
-            <Route path="/manager/profile" element={<ManagerProfile />} />
+            <Route path="/manager/profile" element={<Profile />} />
           </Route>
         </Route>
       </Route>
@@ -94,8 +95,9 @@ export default function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/managers" element={<ManagerApproval />} />
-            <Route path="/admin/system" element={<SystemStatus />} />
+            <Route path="/admin/managers" element={<ManagerApprovals />} />
+            <Route path="/admin/system" element={<SystemHealth />} />
+            <Route path="/admin/settings" element={<Profile />} />
           </Route>
         </Route>
       </Route>
