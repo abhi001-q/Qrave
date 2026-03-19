@@ -12,82 +12,104 @@ export default function ManagerLayout() {
   };
 
   const navItems = [
-    { name: "Overview", path: "/manager", icon: "M21.21 15.89A10 10 0 1 1 8 2.83 M22 12A10 10 0 0 0 12 2v10z" },
-    { name: "Live Orders", path: "/manager/orders", icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8" },
-    { name: "Products", path: "/manager/products", icon: "M20 16.2A2 2 0 0 0 21.6 14L22 10a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2l.4 4a2 2 0 0 0 1.6 2.2V20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2z" },
-    { name: "Categories", path: "/manager/categories", icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8 M8 4h1" },
-    { name: "Tables", path: "/manager/tables", icon: "M16 2v4 M8 2v4 M3 10h18 M4 10v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10" },
-    { name: "Billing", path: "/manager/bills", icon: "M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
-    { name: "Settings", path: "/manager/profile", icon: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" },
+    { name: "Kitchen Control", path: "/manager", icon: "dashboard" },
+    { name: "Orders Flow", path: "/manager/orders", icon: "reorder" },
+    { name: "Product Menu", path: "/manager/products", icon: "restaurant_menu" },
+    { name: "Analytics", path: "/manager/analytics", icon: "query_stats" },
+    { name: "Staff Settings", path: "/manager/staff", icon: "groups" },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#080808] text-white font-sans selection:bg-purple-500 selection:text-white">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 flex-shrink-0 flex flex-col bg-[#111111] shadow-[4px_0_24px_rgba(0,0,0,0.5)] border-r border-white/5 relative z-20">
-        <div className="p-6 h-20 flex items-center border-b border-white/5">
-          <Link to="/" className="text-2xl font-black tracking-tighter w-full">
-            <span className="text-purple-500">Q</span>
-            <span className="text-white">rave <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest ml-1">Manager</span></span>
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA] font-sans selection:bg-primary selection:text-white">
+      {/* Sidebar - Manager Specific (Purple Accents for distinction) */}
+      <aside className="w-full md:w-72 flex-shrink-0 flex flex-col bg-white border-r border-slate-100 relative z-20 shadow-sm">
+        <div className="p-8 h-20 flex items-center border-b border-slate-50">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="bg-slate-900 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg">
+              <span className="material-symbols-outlined text-white text-2xl">restaurant</span>
+            </div>
+            <span className="text-2xl font-black text-slate-900 tracking-tight text-center w-full">Qrave <span className="text-primary italic">Manager</span></span>
           </Link>
         </div>
-        
-        <nav className="flex-1 py-8 px-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
-          <p className="px-4 text-[10px] font-black uppercase text-white/30 tracking-widest mb-2">Management</p>
+
+        <div className="flex-1 py-10 px-6 flex flex-col gap-1.5 overflow-y-auto">
+          <p className="px-4 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4 text-center">Operation Management</p>
           {navItems.map((item) => {
-            // exact match for /manager, startswith for others
-            const isActive = item.path === '/manager' 
-              ? location.pathname === '/manager' 
-              : location.pathname.startsWith(item.path);
-              
+            const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                  isActive 
-                    ? "bg-gradient-to-r from-purple-500/20 to-transparent text-purple-400 font-bold border-l-2 border-purple-500" 
-                    : "text-white/50 hover:text-white hover:bg-white/5 font-medium border-l-2 border-transparent"
+                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 group ${
+                  isActive
+                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isActive ? "text-purple-500" : "text-white/40"}>
-                  {item.icon.split(' M').map((pathD, i) => (
-                    <path key={i} d={i === 0 ? pathD : 'M' + pathD}/>
-                  ))}
-                  {item.name === "Tables" && <rect x="4" y="10" width="16" height="10" rx="2" />}
-                </svg>
-                {item.name}
+                <span className={`material-symbols-outlined transition-colors ${isActive ? "text-orange-400" : "text-slate-400 group-hover:text-slate-600"}`}>
+                  {item.icon}
+                </span>
+                <span className="font-bold text-sm tracking-wide">{item.name}</span>
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-400 shadow-sm shadow-orange-100/50"></div>
+                )}
               </Link>
             );
           })}
-        </nav>
+        </div>
 
-        <div className="p-6 border-t border-white/5 bg-[#0a0a0a]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center font-bold text-sm shadow-lg shadow-purple-500/20 border-2 border-[#111]">
-              {user?.name?.charAt(0) || 'M'}
+        {/* User Card */}
+        <div className="p-6 bg-slate-50/50 border-t border-slate-100 mt-auto">
+          <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-orange-400 font-black text-lg shadow-inner">
+              {user?.name?.charAt(0).toUpperCase() || "M"}
             </div>
-            <div>
-              <p className="text-sm font-bold text-white leading-tight">{user?.name || 'Manager'}</p>
-              <p className="text-xs text-white/40 uppercase tracking-wider">{user?.role || 'MANAGER'}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-slate-900 truncate">
+                {user?.name || "Manager"}
+              </p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || "Manager"}</p>
             </div>
           </div>
+          
           <button
             onClick={handleLogout}
-            className="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold text-white/50 bg-[#151515] hover:bg-red-500/10 hover:text-red-500 border border-white/5 hover:border-red-500/20 transition-all"
+            className="w-full py-3.5 flex items-center justify-center gap-3 rounded-2xl text-sm font-bold text-slate-500 bg-white hover:bg-red-50 hover:text-red-500 border border-slate-100 hover:border-red-200 transition-all shadow-sm active:scale-95 group"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Sign Out
+            <span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">logout</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 relative overflow-y-auto custom-scrollbar">
-        {/* Background ambient light */}
-        <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[150px] pointer-events-none"></div>
-        <div className="p-6 md:p-12 relative z-10 w-full max-w-7xl mx-auto">
-          <Outlet />
+      <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        {/* Top Header */}
+        <header className="h-20 flex-shrink-0 bg-white border-b border-slate-100 flex items-center justify-between px-10">
+          <div>
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Manager Console / <span className="text-slate-900">{navItems.find(i => location.pathname === i.path)?.name || "Overview"}</span></h2>
+          </div>
+          <div className="flex items-center gap-6">
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 border border-orange-100 rounded-xl">
+               <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+               <span className="text-[10px] font-black text-primary uppercase">12 Pending Tasks</span>
+             </div>
+             <div className="h-6 w-px bg-slate-200"></div>
+             <button className="flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-all">
+                  <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
+                </div>
+             </button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-8 md:p-12 relative">
+          {/* Subtle Background Glows */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+          
+          <div className="max-w-6xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
