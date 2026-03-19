@@ -1,3 +1,6 @@
 const router = require("express").Router();
-// TODO: implement menu routes
+const category = require("../controllers/category.controller");
+
+router.get("/", category.getAll);
+
 module.exports = router;
