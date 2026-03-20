@@ -140,7 +140,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#F97316;] hover:bg-red-500 disabled:opacity-50 text-white font-medium text-lg py-4 rounded-lg transition cursor-pointer shadow-sm"
+                className="w-full bg-[#F97316] hover:bg-red-500 disabled:opacity-50 text-white font-medium text-lg py-4 rounded-lg transition cursor-pointer shadow-sm"
               >
                 {loading ? "Updating..." : "Change Password"}
               </button>

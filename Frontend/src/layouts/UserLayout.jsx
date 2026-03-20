@@ -12,73 +12,104 @@ export default function UserLayout() {
   };
 
   const navItems = [
-    { name: "My Board", path: "/dashboard", icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10" },
-    { name: "Order History", path: "/orders", icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8" },
-    { name: "Book Table", path: "/book-table", icon: "M16 2v4 M8 2v4 M3 10h18" },
-    { name: "Profile", path: "/profile", icon: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
-    { name: "Digital Menu", path: "/menu", icon: "M12 2v20 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
+    { name: "My Board", path: "/dashboard", icon: "dashboard" },
+    { name: "Order History", path: "/orders", icon: "history" },
+    { name: "Book Table", path: "/book-table", icon: "event_seat" },
+    { name: "Digital Menu", path: "/menu", icon: "restaurant_menu" },
+    { name: "Profile", path: "/profile", icon: "person" },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#050505] text-white font-sans selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA] font-sans selection:bg-primary selection:text-white">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 flex-shrink-0 flex flex-col bg-[#0f0f0f] border-r border-white/5 relative z-20">
-        <div className="p-6 h-20 flex items-center border-b border-white/5">
-          <Link to="/" className="text-2xl font-black tracking-tighter w-full">
-            <span className="text-orange-500">Q</span>
-            <span className="text-white">rave</span>
+      <aside className="w-full md:w-72 flex-shrink-0 flex flex-col bg-white border-r border-slate-100 relative z-20 shadow-sm">
+        <div className="p-8 h-20 flex items-center border-b border-slate-50">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="bg-primary p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-white text-2xl">restaurant</span>
+            </div>
+            <span className="text-2xl font-black text-slate-900 tracking-tight text-center w-full">Qrave</span>
           </Link>
         </div>
-        
-        <nav className="flex-1 py-8 px-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
+
+        <div className="flex-1 py-10 px-6 flex flex-col gap-1.5 overflow-y-auto">
+          <p className="px-4 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4">Main Navigation</p>
           {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                  isActive 
-                    ? "bg-gradient-to-r from-orange-500/20 to-transparent text-orange-400 font-bold border-l-2 border-orange-500" 
-                    : "text-white/50 hover:text-white hover:bg-white/5 font-medium border-l-2 border-transparent"
+                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 group ${
+                  isActive
+                    ? "bg-orange-50 text-primary shadow-sm shadow-orange-100"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isActive ? "text-orange-500" : "text-white/30"}>
-                  <path d={item.icon}/>
-                  {item.name === "Book Table" && <rect x="3" y="4" width="18" height="18" rx="2"/>}
-                </svg>
-                {item.name}
+                <span className={`material-symbols-outlined transition-colors ${isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-600"}`}>
+                  {item.icon}
+                </span>
+                <span className="font-bold text-sm tracking-wide">{item.name}</span>
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/50"></div>
+                )}
               </Link>
             );
           })}
-        </nav>
+        </div>
 
-        <div className="p-6 border-t border-white/5 bg-[#050505]/50">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-500 flex items-center justify-center font-bold text-sm shadow-lg">
-              {user?.name?.charAt(0) || 'U'}
+        {/* User Card */}
+        <div className="p-6 bg-slate-50/50 border-t border-slate-100 mt-auto">
+          <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-primary font-black text-lg border border-orange-200 shadow-inner">
+              {user?.name?.charAt(0).toUpperCase() || "U"}
             </div>
-            <div>
-              <p className="text-sm font-bold text-white leading-tight">{user?.name || 'User'}</p>
-              <p className="text-xs text-white/40">{user?.role || 'Guest'}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-slate-900 truncate">
+                {user?.name || "User"}
+              </p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || "Customer"}</p>
             </div>
           </div>
+          
           <button
             onClick={handleLogout}
-            className="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold text-white/50 bg-[#111] hover:bg-red-500/10 hover:text-red-500 border border-white/5 hover:border-red-500/20 transition-all"
+            className="w-full py-3.5 flex items-center justify-center gap-3 rounded-2xl text-sm font-bold text-slate-500 bg-white hover:bg-red-50 hover:text-red-500 border border-slate-100 hover:border-red-200 transition-all shadow-sm active:scale-95 group"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Sign Out
+            <span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">logout</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 relative overflow-y-auto custom-scrollbar">
-        {/* Background ambient light */}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[150px] pointer-events-none"></div>
-        <div className="p-6 md:p-10 relative z-10 w-full max-w-7xl mx-auto">
-          <Outlet />
+      <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        {/* Top Header */}
+        <header className="h-20 flex-shrink-0 bg-white border-b border-slate-100 flex items-center justify-between px-10">
+          <div>
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Dashboard / <span className="text-slate-900">{navItems.find(i => location.pathname === i.path)?.name || "Overview"}</span></h2>
+          </div>
+          <div className="flex items-center gap-6">
+             <button className="relative w-10 h-10 flex items-center justify-center text-slate-400 hover:text-primary transition-colors hover:bg-orange-50 rounded-xl">
+               <span className="material-symbols-outlined">notifications</span>
+               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border-2 border-white"></span>
+             </button>
+             <div className="h-6 w-px bg-slate-200"></div>
+             <button className="flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-all">
+                  <span className="material-symbols-outlined text-lg">settings</span>
+                </div>
+             </button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-8 md:p-12 relative">
+          {/* Subtle Background Glows */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+          
+          <div className="max-w-6xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

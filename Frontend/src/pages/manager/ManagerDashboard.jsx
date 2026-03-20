@@ -10,7 +10,7 @@ export default function ManagerDashboard() {
     const fetchDashboardStats = () => {
       setTimeout(() => {
         setStats({
-          todayRevenue: 1245.50,
+          todayRevenue: 1245.5,
           ordersToday: 64,
           pendingOrders: 12,
           tablesOccupied: 8,
@@ -27,144 +27,135 @@ export default function ManagerDashboard() {
   if (loading) {
     return (
       <div className="w-full flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  const coreMetrics = [
+    { name: "Today's Revenue", value: `$${stats.todayRevenue.toFixed(2)}`, trend: "+14.5%", icon: "payments", color: "text-green-600", bg: "bg-green-50" },
+    { name: "Orders Completed", value: stats.ordersToday, trend: "Stable", icon: "done_all", color: "text-blue-600", bg: "bg-blue-50" },
+    { name: "Pending Orders", value: stats.pendingOrders, trend: "Action Req.", icon: "pending_actions", color: "text-orange-600", bg: "bg-orange-50", animate: true },
+    { name: "Table Occupancy", value: `${stats.tablesOccupied}/${stats.totalTables}`, trend: "40% Util.", icon: "event_seat", color: "text-purple-600", bg: "bg-purple-50" },
+  ];
+
   return (
-    <div className="w-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <h1 className="text-4xl lg:text-5xl font-black tracking-tighter mb-2">Operation <span className="text-purple-500">Overview</span></h1>
-          <p className="text-white/50 text-lg">Real-time metrics and daily performance indicators.</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            Kitchen <span className="text-primary italic">Control</span> center
+          </h1>
+          <p className="text-slate-500 mt-2 font-medium">Real-time metrics and operational performance.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-2 text-sm font-bold text-green-500 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/20">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            System Online
-          </span>
-          <p className="text-white/30 text-xs font-bold uppercase tracking-widest">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+        <div className="flex items-center gap-4">
+           <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-100 rounded-full">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-sm font-bold text-green-700">System Online</span>
+           </div>
+           <p className="text-slate-400 text-xs font-black uppercase tracking-widest">
+            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+           </p>
         </div>
       </div>
 
-      {/* Core Metrics grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div className="bg-[#111] border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full blur-2xl -mr-5 -mt-5"></div>
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center border border-green-500/20">
-              <span className="font-serif italic text-xl font-bold">$</span>
+      {/* Core Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {coreMetrics.map((metric) => (
+          <div key={metric.name} className="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
+            <div className={`absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity ${metric.color}`}>
+               <span className="material-symbols-outlined text-8xl">{metric.icon}</span>
             </div>
-            <span className="text-green-500 text-sm font-bold flex items-center gap-1">+14.5%</span>
-          </div>
-          <h2 className="text-4xl font-black text-white mb-1">${stats.todayRevenue.toFixed(2)}</h2>
-          <p className="text-white/40 font-medium text-sm uppercase tracking-wider">Today's Revenue</p>
-        </div>
-
-        <div className="bg-[#111] border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl -mr-5 -mt-5"></div>
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center border border-blue-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <div className="flex justify-between items-start mb-6">
+              <div className={`w-12 h-12 ${metric.bg} ${metric.color} rounded-2xl flex items-center justify-center shadow-inner`}>
+                <span className="material-symbols-outlined">{metric.icon}</span>
+              </div>
+              <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${metric.bg} ${metric.color} ${metric.animate ? 'animate-pulse' : ''}`}>
+                {metric.trend}
+              </span>
             </div>
-            <span className="text-white/30 text-sm font-bold flex items-center gap-1">Orders</span>
+            <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-1">{metric.value}</h3>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{metric.name}</p>
           </div>
-          <h2 className="text-4xl font-black text-white mb-1">{stats.ordersToday}</h2>
-          <p className="text-white/40 font-medium text-sm uppercase tracking-wider">Completed Today</p>
-        </div>
-
-        <div className="bg-[#111] border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl -mr-5 -mt-5"></div>
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center border border-orange-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>
-            </div>
-            <span className="text-red-500 text-sm font-bold flex items-center gap-1 animate-pulse">Action Req.</span>
-          </div>
-          <h2 className="text-4xl font-black text-white mb-1">{stats.pendingOrders}</h2>
-          <p className="text-white/40 font-medium text-sm uppercase tracking-wider">Pending Orders</p>
-        </div>
-
-        <div className="bg-[#111] border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-5 -mt-5"></div>
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-purple-500/10 text-purple-500 rounded-xl flex items-center justify-center border border-purple-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M16 2v4 M8 2v4 M3 10h18"/></svg>
-            </div>
-            <span className="text-purple-400 text-sm font-bold flex items-center gap-1">{((stats.tablesOccupied / stats.totalTables) * 100).toFixed(0)}% Util.</span>
-          </div>
-          <h2 className="text-4xl font-black text-white mb-1">{stats.tablesOccupied}<span className="text-2xl text-white/30">/{stats.totalTables}</span></h2>
-          <p className="text-white/40 font-medium text-sm uppercase tracking-wider">Tables Occupied</p>
-        </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-8 min-h-[400px] flex flex-col">
-          <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-            <h3 className="text-xl font-bold">Revenue Trend</h3>
-            <select className="bg-[#050505] border border-white/10 rounded-lg px-3 py-1 text-sm font-bold text-white outline-none">
-              <option>This Week</option>
-              <option>This Month</option>
-              <option>This Year</option>
+        {/* Revenue Chart Placeholder */}
+        <div className="lg:col-span-2 bg-white rounded-[40px] border border-slate-100 shadow-sm p-8 md:p-10 flex flex-col">
+          <div className="flex items-center justify-between mb-10 pb-4 border-b border-slate-50">
+            <h3 className="text-xl font-extrabold text-slate-900 border-b-4 border-primary pb-2 inline-block">Revenue Trend</h3>
+            <select className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+              <option>Last 7 Days</option>
+              <option>Current Month</option>
+              <option>Year to Date</option>
             </select>
           </div>
           
-          <div className="flex-1 flex items-end gap-2 justify-between mt-auto mx-4">
-            {/* Mock Chart rendering */}
-            {[40, 70, 45, 90, 65, 80, 100].map((height, i) => (
-              <div key={i} className="w-full flex flex-col items-center gap-2 group">
-                <div className="relative w-full bg-[#151515] rounded-t-lg overflow-hidden flex items-end h-[200px] hover:bg-white/5 transition-colors">
-                  <div 
-                    className="w-full bg-gradient-to-t from-purple-600/50 to-purple-400 rounded-t-md group-hover:from-purple-500 group-hover:to-purple-300 transition-all duration-500"
-                    style={{ height: `${height}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs font-bold text-white/40 uppercase">Day {i + 1}</span>
-              </div>
-            ))}
+          <div className="flex-1 flex items-end gap-3 md:gap-5 justify-between px-2 h-[200px]">
+             {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
+               <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
+                  <div className="relative w-full bg-slate-50 rounded-2xl overflow-hidden flex items-end grow hover:bg-orange-50 transition-colors">
+                     <div 
+                      className="w-full bg-gradient-to-t from-primary to-orange-400 rounded-t-xl group-hover:to-orange-300 transition-all duration-700 shadow-lg shadow-primary/10"
+                      style={{ height: `${h}%` }}
+                     ></div>
+                  </div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Day {i+1}</span>
+               </div>
+             ))}
           </div>
         </div>
 
-        <div className="lg:col-span-1 bg-[#111] border border-white/5 rounded-3xl p-8 flex flex-col">
-          <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-            <h3 className="text-xl font-bold">Quick Links</h3>
-          </div>
-          
-          <div className="space-y-4 flex-1">
-            <Link to="/manager/orders" className="flex items-center gap-4 bg-[#050505] p-5 rounded-2xl border border-white/5 hover:border-orange-500/30 group transition-colors">
-               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/50 group-hover:text-orange-500 group-hover:bg-orange-500/10">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-               </div>
-               <div className="flex-1">
-                 <h4 className="font-bold text-white group-hover:text-orange-400 transition-colors">Manage Orders</h4>
-                 <p className="text-xs text-white/40">12 Pending right now</p>
-               </div>
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/20 group-hover:text-orange-500 group-hover:translate-x-1 transition-all"><path d="m9 18 6-6-6-6"/></svg>
-            </Link>
+        {/* Quick Management Links */}
+        <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm p-8 flex flex-col relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+           <h3 className="text-xl font-extrabold text-slate-900 mb-8 relative z-10">Quick Actions</h3>
+           
+           <div className="space-y-4 relative z-10">
+              <Link to="/manager/orders" className="flex items-center gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 hover:border-primary/30 group transition-all">
+                 <div className="w-12 h-12 rounded-2xl bg-white text-slate-400 group-hover:text-primary transition-all flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined">list_alt</span>
+                 </div>
+                 <div className="flex-1">
+                    <h4 className="text-sm font-black text-slate-900 group-hover:text-primary transition-colors">Order Management</h4>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">12 active orders</p>
+                 </div>
+                 <span className="material-symbols-outlined text-slate-200 group-hover:text-primary transition-all group-hover:translate-x-1">chevron_right</span>
+              </Link>
 
-            <Link to="/manager/products" className="flex items-center gap-4 bg-[#050505] p-5 rounded-2xl border border-white/5 hover:border-purple-500/30 group transition-colors">
-               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/50 group-hover:text-purple-500 group-hover:bg-purple-500/10">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 16.2A2 2 0 0 0 21.6 14L22 10a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2l.4 4a2 2 0 0 0 1.6 2.2V20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2z"/></svg>
-               </div>
-               <div className="flex-1">
-                 <h4 className="font-bold text-white group-hover:text-purple-400 transition-colors">Menu & Products</h4>
-                 <p className="text-xs text-white/40">Add, edit or disable items</p>
-               </div>
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/20 group-hover:text-purple-500 group-hover:translate-x-1 transition-all"><path d="m9 18 6-6-6-6"/></svg>
-            </Link>
+              <Link to="/manager/products" className="flex items-center gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 hover:border-purple-300 group transition-all">
+                 <div className="w-12 h-12 rounded-2xl bg-white text-slate-400 group-hover:text-purple-600 transition-all flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined">inventory_2</span>
+                 </div>
+                 <div className="flex-1">
+                    <h4 className="text-sm font-black text-slate-900 group-hover:text-purple-600 transition-colors">Product Catalog</h4>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Edit menu items</p>
+                 </div>
+                 <span className="material-symbols-outlined text-slate-200 group-hover:text-purple-600 transition-all group-hover:translate-x-1">chevron_right</span>
+              </Link>
 
-            <Link to="/manager/bills" className="flex items-center gap-4 bg-[#050505] p-5 rounded-2xl border border-white/5 hover:border-green-500/30 group transition-colors">
-               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/50 group-hover:text-green-500 group-hover:bg-green-500/10">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-               </div>
-               <div className="flex-1">
-                 <h4 className="font-bold text-white group-hover:text-green-400 transition-colors">Print Bills</h4>
-                 <p className="text-xs text-white/40">Manual invoice generation</p>
-               </div>
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/20 group-hover:text-green-500 group-hover:translate-x-1 transition-all"><path d="m9 18 6-6-6-6"/></svg>
-            </Link>
-          </div>
+              <Link to="/manager/bills" className="flex items-center gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 hover:border-green-300 group transition-all">
+                 <div className="w-12 h-12 rounded-2xl bg-white text-slate-400 group-hover:text-green-600 transition-all flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined">point_of_sale</span>
+                 </div>
+                 <div className="flex-1">
+                    <h4 className="text-sm font-black text-slate-900 group-hover:text-green-600 transition-colors">Invoicing</h4>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Manual bill gen</p>
+                 </div>
+                 <span className="material-symbols-outlined text-slate-200 group-hover:text-green-600 transition-all group-hover:translate-x-1">chevron_right</span>
+              </Link>
+           </div>
+
+           <div className="mt-8 bg-orange-50 p-6 rounded-3xl border border-orange-100 flex items-center gap-4 relative overflow-hidden group">
+              <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/10 rounded-full blur-xl transition-all group-hover:scale-150 duration-700"></div>
+              <div className="relative z-10">
+                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">PRO TIP</p>
+                 <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                   Use the <span className="font-black">Digital POS</span> on tablets for faster tableside ordering.
+                 </p>
+              </div>
+           </div>
         </div>
       </div>
     </div>

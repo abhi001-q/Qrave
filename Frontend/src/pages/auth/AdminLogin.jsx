@@ -23,12 +23,12 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       const user = await login(form);
-      
+
       if (user.role !== "admin") {
         toast.error("Access denied: Not an administrator");
         return;
       }
-      
+
       toast.success(`Welcome back, Admin ${user.name}!`);
       navigate("/admin");
     } catch (err) {

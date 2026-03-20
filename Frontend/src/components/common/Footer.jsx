@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FaFacebookF, FaInstagram, FaWhatsapp, FaSnapchatGhost } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -18,9 +19,18 @@ export default function Footer() {
             Revolutionizing the restaurant experience with seamless digital orchestration and delightful dining.
           </p>
           <div className="flex gap-4">
-            {['facebook', 'twitter', 'instagram', 'youtube'].map(social => (
-              <a key={social} href="#" className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all duration-300">
-                <i className={`fa-brands fa-${social}`}></i>
+            {[
+              { icon: <FaFacebookF />, link: "#" },
+              { icon: <FaInstagram />, link: "#" },
+              { icon: <FaWhatsapp />, link: "#" },
+              { icon: <FaSnapchatGhost />, link: "#" },
+            ].map((item, index) => (
+              <a
+                key={index}
+                href={item.link}
+                className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all duration-300"
+              >
+                {item.icon}
               </a>
             ))}
           </div>
@@ -57,11 +67,11 @@ export default function Footer() {
           <p className="text-slate-400 mb-6 font-medium">
             Join our mailing list for exclusive restaurant deals and culinary news.
           </p>
-          <div className="flex bg-slate-800 rounded-2xl border border-slate-700 p-1.5 focus-within:border-primary transition-colors group">
+          <div className="flex bg-slate-800  rounded-2xl border border-slate-700 p-1.5 focus-within:border-primary transition-colors group">
             <input
               type="email"
               placeholder="Your email"
-              className="bg-transparent text-sm w-full outline-none px-4 text-white placeholder:text-slate-600"
+              className="bg-transparent border-none text-sm w-full px-4 text-white placeholder:text-slate-600 outline-none focus:outline-none focus:ring-0 focus:border-none"
             />
             <button className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-[14px] font-bold text-sm transition-all shadow-lg active:scale-95">
               Join

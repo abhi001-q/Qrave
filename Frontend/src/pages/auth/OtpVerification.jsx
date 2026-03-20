@@ -29,6 +29,12 @@ export default function OtpVerification() {
     }
   };
 
+  const handleKeyDown = (e, idx) => {
+    if (e.key === "Backspace" && !otp[idx] && idx > 0) {
+      document.getElementById(`otp-input-${idx - 1}`).focus();
+    }
+  };
+
   const handlePaste = (e) => {
     const paste = e.clipboardData.getData("text").replace(/[^0-9]/g, "");
     if (paste.length === 6) {
@@ -68,29 +74,44 @@ export default function OtpVerification() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFAFA]">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-10 flex flex-col items-center">
-        <div className="mb-6">
-          <div className="flex items-center justify-center mb-2">
-            <span className="material-symbols-outlined text-4xl text-[#F97316] bg-[#FFF3E6] rounded-full p-2">
-              mail
+    <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-lg">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate("/login")}
+          className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-12 group"
+        >
+          <span className="material-symbols-outlined text-xl group-hover:-translate-x-1 transition-transform">
+            arrow_back
+          </span>
+          <span className="text-sm font-semibold tracking-wide uppercase">
+            Back to Login
+          </span>
+        </button>
+
+        <div className="text-center md:text-left mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-50 text-primary mb-6">
+            <span className="material-symbols-outlined text-3xl">
+              mark_email_read
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-center mb-1">
-            Verify Your Email
-          </h2>
-          <p className="text-center text-gray-600 text-base mb-2">
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">
+            Check your email
+          </h1>
+          <p className="text-slate-500 text-lg max-w-md">
             We've sent a 6-digit verification code to{" "}
-            <b>{email || "your email"}</b>.
-            <br />
-            Please enter it below to continue.
+            <span className="text-slate-900 font-semibold">
+              {email || "your email"}
+            </span>
+            .
           </p>
         </div>
-        <form
-          onSubmit={handleSubmit}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <div className="flex gap-3 justify-center mb-2" onPaste={handlePaste}>
+
+        <form onSubmit={handleSubmit} className="space-y-10">
+          <div
+            className="grid grid-cols-6 gap-3 md:gap-4"
+            onPaste={handlePaste}
+          >
             {otp.map((digit, idx) => (
               <input
                 key={idx}
@@ -100,40 +121,67 @@ export default function OtpVerification() {
                 maxLength={1}
                 value={digit}
                 onChange={(e) => handleChange(e, idx)}
-                className="w-12 h-14 text-2xl text-center border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#F97316] outline-none bg-[#FAFAFA]"
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                className="w-full h-16 md:h-20 text-3xl font-bold text-center bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white outline-none transition-all"
                 autoFocus={idx === 0}
               />
             ))}
           </div>
-          <button
-            type="submit"
-            className="w-full bg-[#F97316] hover:bg-[#ea6a0a] text-white font-semibold text-lg py-3 rounded-lg transition shadow-md"
-          >
-            Verify Code
-          </button>
+
+          <div className="flex flex-col gap-4">
+            <button
+              type="submit"
+              disabled={verifying}
+              className="btn-primary w-full py-4 text-lg"
+            >
+              {verifying ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Verifying...</span>
+                </div>
+              ) : (
+                "Verify Code"
+              )}
+            </button>
+
+            <div className="flex items-center justify-between px-2 text-sm">
+              <div className="flex items-center gap-2 text-slate-500 font-medium font-mono bg-slate-100 px-3 py-1.5 rounded-full">
+                <span className="material-symbols-outlined text-base">
+                  schedule
+                </span>
+                <span>{`0${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, "0")}`}</span>
+              </div>
+
+              <div className="text-slate-500">
+                Didn't receive it?{" "}
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={timer > 0}
+                  className={`font-bold transition-colors ${timer > 0 ? "text-slate-300 pointer-events-none" : "text-primary hover:text-primary-hover underline"}`}
+                >
+                  Resend Code
+                </button>
+              </div>
+            </div>
+          </div>
         </form>
-        <div className="flex items-center justify-center gap-2 mt-4 text-gray-500 text-sm">
-          <span className="material-symbols-outlined text-base">schedule</span>
-          <span>{`0${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, "0")}`}</span>
-        </div>
-        <div className="mt-2 text-center text-sm">
-          Didn't receive the code?{" "}
-          <button
-            onClick={handleResend}
-            className="text-[#F97316] font-medium hover:underline"
-            disabled={timer > 0}
-          >
-            Resend Code
-          </button>
-        </div>
-        <div className="w-full border-t border-gray-100 mt-6 pt-4 text-center">
-          <button
-            type="button"
-            onClick={() => navigate("/login")}
-            className="text-gray-500 hover:text-[#F97316] text-sm"
-          >
-            ← Back to Login
-          </button>
+
+        <div className="mt-16 bg-slate-50 rounded-2xl p-6 border border-slate-100">
+          <div className="flex items-start gap-4">
+            <span className="material-symbols-outlined text-slate-400">
+              help_outline
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 mb-1">
+                Need help?
+              </h4>
+              <p className="text-sm text-slate-500">
+                Check your spam folder or contact our support team if you're
+                having trouble receiving the code.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
