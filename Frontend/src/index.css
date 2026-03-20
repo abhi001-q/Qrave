@@ -30,4 +30,24 @@
   .input-field {
     @apply w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  }
+
+  .custom-scrollbar-h::-webkit-scrollbar {
+    height: 6px;
+  }
+  .custom-scrollbar-h::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar-h::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  }
 }
