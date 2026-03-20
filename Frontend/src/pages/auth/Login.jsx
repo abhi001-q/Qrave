@@ -56,7 +56,7 @@ export default function Login() {
         toast.success(`Welcome back, ${user.name}!`);
 
         if (user.role === "admin") navigate("/admin");
-        else if (user.role === "manager") navigate("/manager");
+        else if (user.role === "manager" || user.role === "staff") navigate("/manager");
         else navigate("/dashboard");
       }
     } catch (err) {
