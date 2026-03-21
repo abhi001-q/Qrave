@@ -14,7 +14,9 @@ export default function ManagerLayout() {
   const navItems = [
     { name: "Kitchen Control", path: "/manager", icon: "dashboard" },
     { name: "Orders Flow", path: "/manager/orders", icon: "reorder" },
+    { name: "Floor Map", path: "/manager/tables", icon: "grid_view" },
     { name: "Product Menu", path: "/manager/products", icon: "restaurant_menu" },
+    { name: "Billing Terminal", path: "/manager/bills", icon: "point_of_sale" },
     { name: "Analytics", path: "/manager/analytics", icon: "query_stats" },
     { name: "Staff Settings", path: "/manager/staff", icon: "groups" },
   ];
