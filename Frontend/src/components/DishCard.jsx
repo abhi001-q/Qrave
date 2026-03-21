@@ -1,14 +1,16 @@
 import React from "react";
 import { useCart } from "../hooks/useCart";
 
-export default function DishCard({ id, title, price, image, description }) {
+export default function DishCard({ id, name, title, price, image, description }) {
   const { addItem } = useCart();
+  const displayName = name || title || "Untitled Dish";
+  const displayPrice = typeof price === 'number' ? `$${price.toFixed(2)}` : price;
 
   return (
     <div className="bg-white border border-slate-100 rounded-[32px] overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col h-full relative cursor-pointer shadow-sm">
       <div className="h-48 overflow-hidden relative">
         <img
-          alt={title}
+          alt={displayName}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           src={image}
         />
@@ -21,13 +23,13 @@ export default function DishCard({ id, title, price, image, description }) {
         <div className="flex justify-between items-start mb-3">
           <div className="bg-orange-50 px-3 py-1 rounded-full border border-orange-100/50">
             <span className="text-primary font-black text-[10px] uppercase tracking-[0.15em]">
-              {price}
+              {displayPrice}
             </span>
           </div>
         </div>
 
         <h3 className="text-lg font-black text-slate-900 mb-1.5 leading-tight group-hover:text-primary transition-colors truncate">
-          {title}
+          {displayName}
         </h3>
 
         <p className="text-slate-500 text-xs mb-6 flex-grow line-clamp-2 leading-relaxed font-medium">
@@ -40,8 +42,8 @@ export default function DishCard({ id, title, price, image, description }) {
             e.stopPropagation();
             addItem({
               id,
-              title,
-              price: parseFloat(price.replace(/[^0-9.-]+/g, "")),
+              title: displayName,
+              price: typeof price === 'number' ? price : parseFloat(String(price).replace(/[^0-9.-]+/g, "")),
               image,
               quantity: 1,
             });

@@ -67,9 +67,9 @@ exports.verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp)
       return sendError(res, 400, "Email and OTP are required");
-    const data = await authService.verifyOtp(email, otp);
-    if (!data) return sendError(res, 400, "Invalid or expired OTP");
-    sendSuccess(res, 200, data, "OTP verified");
+    const valid = await authService.verifyOtp(email, otp);
+    if (!valid) return sendError(res, 400, "Invalid or expired OTP");
+    sendSuccess(res, 200, null, "OTP verified");
   } catch (err) {
     sendError(res, err.status || 500, err.message);
   }

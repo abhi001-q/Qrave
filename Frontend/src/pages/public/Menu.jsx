@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import DishCard from "../../components/DishCard";
 import CategoryFilter from "../../components/CategoryFilter";
 import { menuService } from "../../services/menuService";
@@ -7,17 +8,19 @@ import CartPanel from "../../components/CartPanel";
 export default function Menu() {
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Extract filters from URL Search Params
+  const query = searchParams.get("q") || "";
+  const category = searchParams.get("category") || "All";
 
   useEffect(() => {
     const fetchDishes = async () => {
       try {
         const data = await menuService.getAll();
-        // Map backend category_name to category for the frontend filters
-        const mappedData = (data || []).map(item => ({
+        const mappedData = (data || []).map((item) => ({
           ...item,
-          category: item.category_name || item.category || "Other"
+          category: item.category_name || item.category || "Other",
         }));
         setDishes(mappedData);
       } catch (error) {
@@ -29,88 +32,119 @@ export default function Menu() {
     fetchDishes();
   }, []);
 
+  const handleCategorySelect = (cat) => {
+    const params = new URLSearchParams(searchParams);
+    if (cat === "All") params.delete("category");
+    else params.set("category", cat);
+    setSearchParams(params);
+  };
+
   const filteredDishes = dishes.filter((d) => {
-    const matchesCategory = activeCategory === "All" || d.category === activeCategory;
-    const matchesSearch = d.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (d.description && d.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Backend uses category_id or category_name, frontend expects 'category'
+    const itemCategory = d.category_name || d.category;
+    const matchesCategory = category === "All" || itemCategory === category;
+    
+    // Backend uses 'name', frontend was expecting 'title'
+    const name = d.name || d.title || "";
+    const description = d.description || "";
+    
+    const matchesSearch =
+      name.toLowerCase().includes(query.toLowerCase()) ||
+      description.toLowerCase().includes(query.toLowerCase());
+      
     return matchesCategory && matchesSearch;
   });
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-white lg:bg-[#FAFAFA]">
-      {/* 1. Main Center Content */}
-      <main className="flex-1 min-w-0 flex flex-col h-full bg-white lg:bg-[#FAFAFA] relative">
-        {/* Top Search Bar Pane */}
-        <header className="h-20 flex-shrink-0 bg-white border-b border-slate-100 flex items-center px-6 lg:px-10 gap-8 sticky top-0 z-40">
-          <div className="flex-1 flex items-center bg-slate-50 rounded-2xl border border-slate-100 px-4 group focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-300">
-            <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-            <input 
-              type="text" 
-              placeholder="Search dishes, flavors, or ingredients..."
-              className="w-full bg-transparent border-none py-3 px-4 text-sm font-bold text-slate-900 placeholder:text-slate-400 outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-             <button className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-primary transition-all hover:bg-orange-50 rounded-xl border border-slate-100 lg:border-none shadow-sm lg:shadow-none bg-white lg:bg-transparent">
-               <span className="material-symbols-outlined">filter_list</span>
-             </button>
-          </div>
-        </header>
+    <div className="flex bg-[#FAFAFA] min-h-full">
+      {/* 1. Main Center Content Area */}
+      <main className="flex-1 min-w-0 flex flex-col bg-[#FAFAFA] relative">
+        <div className="px-10 lg:px-16 py-8 pb-32">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* Category Filter Pills (Sticky) */}
+            <div className="sticky top-0 z-30 transition-all bg-[#FAFAFA]/80 backdrop-blur-md pt-4 pb-2">
+              <div className="flex items-center gap-4 p-2 rounded-[32px] animate-in fade-in slide-in-from-top-4 duration-700">
+                <CategoryFilter
+                  activeCategory={category}
+                  onSelect={handleCategorySelect}
+                />
+              </div>
+            </div>
 
-        {/* Categories & Grid Section */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 lg:px-10 py-8 space-y-12 pb-24">
-          <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
-            <CategoryFilter
-              activeCategory={activeCategory}
-              onSelect={setActiveCategory}
-            />
-          </div>
-
-          <div className="space-y-6">
-            <div className="flex items-baseline justify-between mb-8 px-2">
-               <div className="flex items-center gap-4">
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-none italic uppercase">
-                    {activeCategory} <span className="text-primary not-italic tracking-tighter normal-case">Selection</span>
-                  </h2>
-               </div>
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{filteredDishes.length} Items found</p>
+            {/* Page Header Selection Info */}
+            <div className="flex items-baseline justify-between border-b border-slate-100/60 pb-8 pt-2">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-[2px] bg-primary/20 rounded-full"></span>
+                  <p className="text-[11px] font-black text-primary uppercase tracking-[0.4em] opacity-90 leading-none">
+                    Explore Flavors
+                  </p>
+                </div>
+                <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">
+                  {category}{" "}
+                  <span className="text-primary not-italic tracking-tighter italic normal-case">
+                    Selection
+                  </span>
+                </h2>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">
+                  {filteredDishes.length} Items found
+                </p>
+                {query && (
+                  <p className="text-xs font-bold text-slate-500">
+                    Searching for:{" "}
+                    <span className="text-primary font-black italic">"{query}"</span>
+                  </p>
+                )}
+              </div>
             </div>
 
             {loading ? (
-              <div className="h-[60vh] flex flex-col justify-center items-center gap-6">
+              <div className="h-[50vh] flex flex-col justify-center items-center gap-8 bg-white/50 rounded-[48px] border border-white shadow-sm">
                 <div className="w-16 h-16 border-4 border-slate-100 border-t-primary rounded-full animate-spin shadow-inner"></div>
-                <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">Preparing the latest menu...</p>
+                <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">
+                  Restocking the virtual kitchen...
+                </p>
               </div>
             ) : filteredDishes.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8 pb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-10 lg:gap-11 px-2">
                 {filteredDishes.map((dish) => (
                   <DishCard key={dish.id} {...dish} />
                 ))}
               </div>
             ) : (
-              <div className="h-[60vh] flex flex-col items-center justify-center text-center animate-in zoom-in duration-500">
-                 <div className="w-24 h-24 rounded-[40px] bg-slate-50 flex items-center justify-center text-slate-200 mb-8 shadow-inner border border-slate-100">
-                   <span className="material-symbols-outlined text-5xl font-light">shopping_basket_off</span>
-                 </div>
-                 <h3 className="text-slate-900 font-black text-2xl mb-2 tracking-tight">No flavor matches</h3>
-                 <p className="text-slate-500 font-bold text-sm max-w-xs leading-relaxed">We couldn't find any dishes matching "{searchQuery}" in our {activeCategory} section.</p>
-                 <button 
-                  onClick={() => {setSearchQuery(""); setActiveCategory("All");}}
-                  className="mt-8 text-primary font-black text-xs uppercase tracking-[0.2em] hover:underline underline-offset-8 transition-all"
-                 >
-                   Reset All Filters
-                 </button>
+              <div className="h-[55vh] flex flex-col items-center justify-center text-center animate-in zoom-in duration-700 bg-white rounded-[60px] border border-slate-100 shadow-xl shadow-slate-200/50 p-12 max-w-4xl mx-auto group">
+                <div className="w-32 h-32 rounded-[48px] bg-slate-50 flex items-center justify-center text-slate-200 mb-10 shadow-inner border border-slate-100 group-hover:scale-110 transition-transform duration-500">
+                  <div className="relative">
+                    <span className="material-symbols-outlined text-6xl font-light scale-125">
+                      search_off
+                    </span>
+                    <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full border-4 border-white"></div>
+                  </div>
+                </div>
+                <h3 className="text-slate-900 font-black text-3xl mb-4 tracking-tight">
+                  No flavor matches
+                </h3>
+                <p className="text-slate-500 font-bold text-lg max-w-md leading-relaxed opacity-80 mb-10">
+                  Your craving for{" "}
+                  <span className="text-primary italic">
+                    "{query || category}"
+                  </span>{" "}
+                  didn't return any results. Try adjusting your search or
+                  category filter to find something delicious!
+                </p>
               </div>
             )}
           </div>
         </div>
       </main>
 
-      {/* 2. Right Sidebar - The Cart Panel */}
-      <aside className="hidden xl:block w-[420px] flex-shrink-0 h-full relative z-40 bg-white border-l border-slate-100 shadow-[-20px_0_50px_-20px_rgba(0,0,0,0.05)]">
-        <CartPanel />
+      {/* 2. Right Sidebar - Fixed Cart Panel */}
+      <aside className="hidden xl:block w-[440px] flex-shrink-0 bg-white border-l border-slate-100 shadow-[-20px_0_60px_-15px_rgba(0,0,0,0.03)] relative z-40">
+        <div className="sticky top-0 h-[calc(100vh-6rem)] overflow-hidden">
+          <CartPanel />
+        </div>
       </aside>
     </div>
   );

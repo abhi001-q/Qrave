@@ -30,6 +30,8 @@ import TableBooking from "../pages/user/TableBooking";
 import Profile from "../pages/user/Profile";
 import Checkout from "../pages/user/Checkout";
 import OrderTracking from "../pages/user/OrderTracking";
+import PaymentSuccess from "../pages/user/PaymentSuccess";
+import PaymentFailure from "../pages/user/PaymentFailure";
 
 // Manager pages
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
@@ -73,6 +75,8 @@ export default function AppRoutes() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/failure" element={<PaymentFailure />} />
           </Route>
         </Route>
       </Route>

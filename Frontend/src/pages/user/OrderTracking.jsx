@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { orderService } from "../../services/orderService";
+import { paymentService } from "../../services/paymentService";
+import { toast } from "react-toastify";
 
 export default function OrderTracking() {
   const { id } = useParams();
@@ -18,7 +20,26 @@ export default function OrderTracking() {
     try {
       const response = await orderService.getById(id);
       if (response.data) {
-        setOrder(response.data);
+        const orderData = response.data;
+        setOrder(orderData);
+
+        // eSewa Status Check Fallback
+        // If order is pending and uses eSewa, check with eSewa directly
+        if (orderData.status === "pending" && orderData.payment_method === "eSewa") {
+          const transaction_uuid = `QRV-${orderData.id}`;
+          const total_amount = orderData.total_amount || orderData.total;
+          
+          const statusUrl = `${paymentService.getStatusUrl()}?product_code=${paymentService.getMerchantId()}&total_amount=${total_amount}&transaction_uuid=${transaction_uuid}`;
+          
+          const esewaRes = await fetch(statusUrl).then(r => r.json());
+          if (esewaRes.status === "COMPLETE") {
+            await orderService.updateStatus(orderData.id, "PAID");
+            toast.success("Payment confirmed via status check!");
+            // Refresh order data after update
+            const updated = await orderService.getById(id);
+            if (updated.data) setOrder(updated.data);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching order status:", error);
