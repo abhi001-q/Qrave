@@ -22,6 +22,12 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  const setAuth = (userData, token) => {
+    localStorage.setItem('qrave_user', JSON.stringify(userData));
+    localStorage.setItem('qrave_token', token);
+    setUser(userData);
+  };
+
   const logout = () => {
     localStorage.removeItem('qrave_user');
     localStorage.removeItem('qrave_token');
@@ -29,7 +35,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, setAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function OtpVerification() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(119); // 1:59 in seconds
   const [verifying, setVerifying] = useState(false);
+  const { setAuth } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email;
@@ -52,7 +54,8 @@ export default function OtpVerification() {
     try {
       const { authService } = await import("../../services/authService");
       const code = otp.join("");
-      await authService.verifyOtp(email, code);
+      const { user, token } = await authService.verifyOtp(email, code);
+      setAuth(user, token);
       toast.success("OTP verified! Account activated.");
       navigate("/dashboard");
     } catch (err) {

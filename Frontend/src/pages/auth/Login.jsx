@@ -4,7 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { toast } from "react-toastify";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
 
   const [isRegister, setIsRegister] = useState(false);
@@ -29,6 +29,7 @@ export default function Login() {
     try {
       if (isRegister) {
         // Registration Logic
+        logout(); // Clear any existing session
         if (!formData.name || !formData.email || !formData.password) {
           toast.error("Please fill all required fields");
           setLoading(false);

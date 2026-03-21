@@ -94,7 +94,22 @@ const authService = {
   },
 
   async verifyOtp(email, otp) {
-    return await User.verifyOTP(email, otp);
+    const isValid = await User.verifyOTP(email, otp);
+    if (!isValid) return null;
+
+    const user = await User.findByEmail(email);
+    if (!user) return null;
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
+    );
+
+    // Remove password from response
+    const { password: _, ...safeUser } = user;
+    return { user: safeUser, token };
   },
 
   async resetPassword(email, otp, newPassword) {
