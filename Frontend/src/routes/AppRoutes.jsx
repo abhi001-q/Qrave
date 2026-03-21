@@ -52,8 +52,6 @@ export default function AppRoutes() {
       {/* ── Public (guest + logged-in users) ── */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
-
-        <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -71,6 +69,7 @@ export default function AppRoutes() {
             <Route path="/orders/:id" element={<OrderDetail />} />
             <Route path="/book-table" element={<TableBooking />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/menu" element={<Menu />} />
             <Route path="/checkout" element={<Checkout />} />
           </Route>
         </Route>
