@@ -29,6 +29,7 @@ import OrderDetail from "../pages/user/OrderDetail";
 import TableBooking from "../pages/user/TableBooking";
 import Profile from "../pages/user/Profile";
 import Checkout from "../pages/user/Checkout";
+import OrderTracking from "../pages/user/OrderTracking";
 
 // Manager pages
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
@@ -67,6 +68,7 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/orders" element={<OrderHistory />} />
             <Route path="/orders/:id" element={<OrderDetail />} />
+            <Route path="/orders/track/:id" element={<OrderTracking />} />
             <Route path="/book-table" element={<TableBooking />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/menu" element={<Menu />} />

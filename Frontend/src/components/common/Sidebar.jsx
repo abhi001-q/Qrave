@@ -14,14 +14,14 @@ export default function Sidebar() {
 
   const navItems = [
     { name: "My Board", path: "/dashboard", icon: "dashboard" },
+    { name: "Digital Menu", path: "/menu", icon: "restaurant_menu" },
     { name: "Order History", path: "/orders", icon: "history" },
     { name: "Book Table", path: "/book-table", icon: "event_seat" },
-    { name: "Digital Menu", path: "/menu", icon: "restaurant_menu" },
     { name: "Profile", path: "/profile", icon: "person" },
   ];
 
   return (
-    <aside className="w-full md:w-72 flex-shrink-0 flex flex-col bg-white border-r border-slate-100 relative z-30 shadow-sm overflow-hidden h-full">
+    <aside className="w-full h-[100vh] md:w-72 flex-shrink-0 flex flex-col bg-white border-r border-slate-100 relative z-30 shadow-sm overflow-hidden h-full">
       <div className="p-8 h-20 flex items-center border-b border-slate-50">
         <Link to="/" className="flex items-center gap-2 group">
           <div className="bg-primary p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">

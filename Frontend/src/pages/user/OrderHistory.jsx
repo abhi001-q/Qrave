@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 export default function OrderHistory() {
   // Dummy data for visual representation
   const orders = [
-    { id: "ORD-1284", date: "2024-03-15", amount: 154.50, items: 3, status: "Delivered", color: "bg-green-100 text-green-700" },
-    { id: "ORD-1283", date: "2024-03-14", amount: 22.00, items: 1, status: "Delivered", color: "bg-green-100 text-green-700" },
-    { id: "ORD-1282", date: "2024-03-12", amount: 89.25, items: 5, status: "Cancelled", color: "bg-red-100 text-red-700" },
-    { id: "ORD-1281", date: "2024-03-10", amount: 45.00, items: 2, status: "Preparing", color: "bg-orange-100 text-orange-600" },
+    { id: "ORD-1284", date: "2024-03-15", amount: 154.50, items: 3, status: "Delivered", color: "bg-green-100 text-green-700", trackId: "1284" },
+    { id: "ORD-1283", date: "2024-03-14", amount: 22.00, items: 1, status: "Delivered", color: "bg-green-100 text-green-700", trackId: "1283" },
+    { id: "ORD-1282", date: "2024-03-12", amount: 89.25, items: 5, status: "Cancelled", color: "bg-red-100 text-red-700", trackId: "1282" },
+    { id: "ORD-1281", date: "2024-03-10", amount: 45.00, items: 2, status: "Preparing", color: "bg-orange-100 text-orange-600", trackId: "1281" },
   ];
 
   return (
@@ -61,9 +61,12 @@ export default function OrderHistory() {
                       {order.status}
                     </span>
                   </td>
-                  <td className="py-6 pr-4 text-right">
+                   <td className="py-6 pr-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all shadow-sm">
+                      <Link to={`/orders/track/${order.trackId}`} title="Track Order" className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all shadow-sm">
+                         <span className="material-symbols-outlined text-xl">monitoring</span>
+                      </Link>
+                      <button title="View Detail" className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all shadow-sm">
                          <span className="material-symbols-outlined text-xl">visibility</span>
                       </button>
                       <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-primary transition-all shadow-md shadow-slate-200">

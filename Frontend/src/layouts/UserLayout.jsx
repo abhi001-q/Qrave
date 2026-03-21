@@ -8,6 +8,7 @@ export default function UserLayout() {
   const navItems = [
     { name: "My Board", path: "/dashboard" },
     { name: "Order History", path: "/orders" },
+    { name: "Track Order", path: "/orders" },
     { name: "Book Table", path: "/book-table" },
     { name: "Digital Menu", path: "/menu" },
     { name: "Profile", path: "/profile" },
