@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
@@ -5,6 +6,16 @@ export default function ManagerLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    const handleNewToast = (e) => {
+      setNotifications(prev => [e.detail, ...prev]);
+    };
+    window.addEventListener('global-toast', handleNewToast);
+    return () => window.removeEventListener('global-toast', handleNewToast);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -91,17 +102,57 @@ export default function ManagerLayout() {
           <div>
             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Manager Console / <span className="text-slate-900">{navItems.find(i => location.pathname === i.path)?.name || "Overview"}</span></h2>
           </div>
-          <div className="flex items-center gap-6">
-             <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 border border-orange-100 rounded-xl">
-               <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
-               <span className="text-[10px] font-black text-primary uppercase">12 Pending Tasks</span>
-             </div>
+          <div className="flex items-center gap-6 relative">
+             <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100 transition-colors"
+             >
+               {notifications.length > 0 ? (
+                 <>
+                   <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                   <span className="text-[10px] font-black text-slate-900 uppercase">{notifications.length} Alerts</span>
+                 </>
+               ) : (
+                 <span className="text-[10px] font-black text-slate-400 uppercase">No Alerts</span>
+               )}
+             </button>
+
+             {/* Notification Dropdown Panel */}
+             {showNotifications && (
+               <div className="absolute top-14 right-16 w-80 bg-white border border-slate-100 shadow-2xl rounded-3xl p-4 z-50 animate-in slide-in-from-top-4 fade-in">
+                  <div className="flex justify-between items-center border-b border-slate-50 pb-3 mb-3">
+                     <h4 className="text-sm font-black text-slate-900">Notifications</h4>
+                     <button onClick={() => setNotifications([])} className="text-[10px] font-bold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest">
+                       Clear All
+                     </button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-2">
+                     {notifications.length === 0 ? (
+                       <p className="text-xs font-bold text-slate-400 text-center py-4">You're all caught up!</p>
+                     ) : (
+                       notifications.map(n => (
+                         <div key={n.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-3">
+                            <div className={`w-2 h-2 rounded-full mt-1 shrink-0 ${
+                              n.type === 'success' ? 'bg-green-500' : 
+                              n.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                            }`}></div>
+                            <div>
+                               <p className="text-xs font-bold text-slate-700 leading-tight">{n.message}</p>
+                               <span className="text-[9px] font-bold text-slate-400 uppercase mt-1 block">Just now</span>
+                            </div>
+                         </div>
+                       ))
+                     )}
+                  </div>
+               </div>
+             )}
+
              <div className="h-6 w-px bg-slate-200"></div>
-             <button className="flex items-center gap-2 group">
+             <Link to="/manager/profile" className="flex items-center gap-2 group">
                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-all">
                   <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
                 </div>
-             </button>
+             </Link>
           </div>
         </header>
 

@@ -16,8 +16,11 @@ const Home = () => {
   }, []);
 
   const filteredItems = menuItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === "All" || item.category_name === activeCategory;
+    const itemName = item.title || item.name || "";
+    const itemCategory = item.category || item.category_name || "All";
+    
+    const matchesSearch = itemName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = activeCategory === "All" || itemCategory === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -82,7 +85,7 @@ const Home = () => {
               />
             </div>
             <div className="space-y-1 px-1">
-              <h3 className="font-black text-slate-800 text-lg leading-tight truncate">{item.name}</h3>
+              <h3 className="font-black text-slate-800 text-lg leading-tight truncate">{item.title || item.name}</h3>
               <p className="text-[10px] text-slate-400 font-bold leading-tight line-clamp-2 min-h-[2.5em]">
                 {item.description || "Freshly prepared with the finest ingredients."}
               </p>

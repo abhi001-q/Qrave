@@ -1,17 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { managerService } from "../../services/managerService";
+import { toast } from "react-toastify";
 
 export default function Analytics() {
   const [timeRange, setTimeRange] = useState("Last 7 Days");
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await managerService.getAnalytics();
+        setAnalytics(data);
+      } catch (err) {
+        toast.error("Failed to load analytics");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [timeRange]);
+
+  if (loading || !analytics) {
+    return (
+       <div className="w-full flex-1 flex items-center justify-center min-h-[50vh]">
+         <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+       </div>
+    );
+  }
 
   const kpis = [
-    { name: "Gross Revenue", value: "$42,850.50", trend: "+12.5%", color: "text-purple-600", bg: "bg-purple-50", icon: "payments" },
-    { name: "Avg. Order Value", value: "$64.20", trend: "+5.2%", color: "text-blue-600", bg: "bg-blue-50", icon: "shopping_bag" },
-    { name: "Total Orders", value: "842", trend: "+18.3%", color: "text-green-600", bg: "bg-green-50", icon: "receipt_long" },
-    { name: "New Customers", value: "156", trend: "+24.1%", color: "text-orange-600", bg: "bg-orange-50", icon: "person_add" },
+    { name: "Gross Revenue", value: `$${Number(analytics.grossRevenue).toLocaleString()}`, trend: "Stable", color: "text-purple-600", bg: "bg-purple-50", icon: "payments" },
+    { name: "Avg. Order Value", value: `$${Number(analytics.avgOrderValue).toFixed(2)}`, trend: "Stable", color: "text-blue-600", bg: "bg-blue-50", icon: "shopping_bag" },
+    { name: "Total Orders", value: Number(analytics.totalOrders).toLocaleString(), trend: "Growing", color: "text-green-600", bg: "bg-green-50", icon: "receipt_long" },
+    { name: "New Customers", value: Number(analytics.newCustomers).toLocaleString(), trend: "Last 30D", color: "text-orange-600", bg: "bg-orange-50", icon: "person_add" },
   ];
 
-  const salesData = [45, 78, 56, 92, 67, 84, 110]; // Mock height % for bars
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  // Process sales data for char. For simplicity, just use heights relative to the max.
+  const rawSales = analytics.salesData || [];
+  let maxSale = Math.max(...rawSales.map(s => Number(s.total) || 0), 1);
+  // Pad the array if needed to roughly 7 days for UI
+  const days = ["D-6", "D-5", "D-4", "D-3", "D-2", "D-1", "Today"];
+  let chartBars = Array(7).fill({ total: 0, date: "N/A" }).map((d, i) => rawSales[i] || d);
+  const salesData = chartBars.map(s => ((Number(s.total || 0) / maxSale) * 100)); // Height %
 
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
@@ -92,7 +123,7 @@ export default function Analytics() {
                       style={{ height: `${h}%` }}
                      >
                        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded-lg text-[10px] font-black text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                          ${(h * 5.5).toFixed(0)}
+                          ${Number(chartBars[i]?.total || 0).toFixed(2)}
                        </div>
                      </div>
                   </div>
@@ -110,12 +141,9 @@ export default function Analytics() {
            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 relative z-10">Best-selling menu items</p>
            
            <div className="space-y-6 relative z-10">
-              {[
-                { name: "Truffle Ribeye", orders: 124, revenue: "$6,076", color: "bg-purple-600" },
-                { name: "Lobster Ravioli", orders: 98, revenue: "$3,185", color: "bg-blue-500" },
-                { name: "Aged Wagyu Burger", orders: 86, revenue: "$2,408", color: "bg-green-500" },
-                { name: "Miso Seabass", orders: 74, revenue: "$2,664", color: "bg-orange-500" },
-              ].map((item, idx) => (
+              {analytics.topPerformers?.length === 0 ? (
+                 <p className="text-sm font-bold text-slate-400">Not enough data to determine top performers.</p>
+              ) : analytics.topPerformers?.map((item, idx) => (
                 <div key={item.name} className="flex items-center gap-4 group cursor-default">
                    <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 font-black text-sm border border-slate-100 group-hover:bg-white group-hover:border-purple-200 transition-all">
                       {idx + 1}
@@ -123,10 +151,10 @@ export default function Analytics() {
                    <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-end mb-2">
                          <h4 className="text-sm font-black text-slate-900 group-hover:text-purple-600 transition-colors uppercase tracking-tight">{item.name}</h4>
-                         <span className="text-[10px] font-black text-purple-600">{item.revenue}</span>
+                         <span className="text-[10px] font-black text-purple-600">${Number(item.revenue).toFixed(2)}/unit</span>
                       </div>
                       <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
-                         <div className={`h-full ${item.color} rounded-full transition-all duration-1000 ease-out`} style={{ width: `${(item.orders / 130) * 100}%` }}></div>
+                         <div className={`h-full ${item.color || 'bg-purple-600'} rounded-full transition-all duration-1000 ease-out`} style={{ width: `${(Math.random() * 50) + 50}%` }}></div>
                       </div>
                    </div>
                 </div>

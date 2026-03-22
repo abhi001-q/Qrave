@@ -52,7 +52,7 @@ export default function CartPage() {
                   </button>
                 </div>
                 
-                <p className="text-orange-400 font-bold mb-4">${item.price.toFixed(2)}</p>
+                <p className="text-orange-400 font-bold mb-4">${Number(item.price).toFixed(2)}</p>
                 
                 <div className="flex items-center gap-4 mt-auto">
                   <div className="flex items-center bg-[#050505] rounded-full border border-white/10">

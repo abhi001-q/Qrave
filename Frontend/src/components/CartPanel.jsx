@@ -235,7 +235,7 @@ export default function CartPanel() {
                     {item.title}
                   </h4>
                   <p className="text-[11px] font-bold text-primary">
-                    ${item.price.toFixed(2)}
+                    ${Number(item.price).toFixed(2)}
                   </p>
                 </div>
                 <div className="flex items-center bg-slate-50 border border-slate-100 rounded-xl p-1 shadow-inner">

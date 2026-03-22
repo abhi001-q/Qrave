@@ -31,6 +31,29 @@ const User = {
     return rows;
   },
 
+  async findAllStaff() {
+    const [rows] = await pool.query(
+      "SELECT id, name, email, phone, role, is_active as status, created_at FROM users WHERE role != 'user' ORDER BY id DESC",
+    );
+    return rows.map(r => ({
+      ...r,
+      status: r.status ? "Active" : "Inactive"
+    }));
+  },
+
+  async updateStatus(id, isActive) {
+    const [result] = await pool.query(
+      "UPDATE users SET is_active = ? WHERE id = ?",
+      [isActive ? 1 : 0, id]
+    );
+    return result.affectedRows;
+  },
+
+  async delete(id) {
+    const [result] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
+    return result.affectedRows;
+  },
+
   async setOTP(email, otp, expires) {
     await pool.query(
       "UPDATE users SET otp_code = ?, otp_expires = ? WHERE email = ?",

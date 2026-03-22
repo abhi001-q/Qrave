@@ -1,65 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { orderService } from "../../services/orderService";
 
 export default function Orders() {
-  const [orders, setOrders] = useState([
-    { 
-      id: "1038A", 
-      table: 4, 
-      status: "PENDING", 
-      items: 3, 
-      total: 45.00, 
-      time: "2 min ago",
-      type: "Dine-in"
-    },
-    { 
-      id: "1038B", 
-      table: 12, 
-      status: "PENDING", 
-      items: 1, 
-      total: 18.00, 
-      time: "5 min ago",
-      type: "Dine-in"
-    },
-    { 
-      id: "1037C", 
-      table: null, 
-      status: "PREPARING", 
-      items: 4, 
-      total: 84.50, 
-      time: "12 min ago",
-      type: "Delivery",
-      customer: { name: "Jason Derulo", phone: "+977-9801234567", address: "Sector 4, Elite Heights, Building A" }
-    },
-    { 
-      id: "1036D", 
-      table: 8, 
-      status: "READY", 
-      items: 2, 
-      total: 32.00, 
-      time: "18 min ago",
-      type: "Dine-in"
-    },
-    { 
-      id: "1035X", 
-      table: null, 
-      status: "READY", 
-      items: 2, 
-      total: 44.00, 
-      time: "22 min ago",
-      type: "Delivery",
-      customer: { name: "Sarah Connor", phone: "+977-9811223344", address: "Cyberdyne Street, West Wing 101" }
-    },
-    { 
-      id: "1035E", 
-      table: 1, 
-      status: "DELIVERED", 
-      items: 5, 
-      total: 112.00, 
-      time: "45 min ago",
-      type: "Dine-in"
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await orderService.getAllAsManager();
+        setOrders(response || []);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load live orders");
+      }
+    };
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const columns = [
     { id: "PENDING", title: "New Orders", color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
@@ -69,9 +28,14 @@ export default function Orders() {
     { id: "DELIVERED", title: "Settled", color: "text-green-600", bg: "bg-green-50", border: "border-green-100" }
   ];
 
-  const moveOrder = (orderId, newStatus) => {
-    setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-    toast.info(`Order #${orderId} moved to ${newStatus.replace(/_/g, ' ')}`);
+  const moveOrder = async (orderId, newStatus) => {
+    try {
+      await orderService.updateStatus(orderId, newStatus);
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      toast.info(`Order #${orderId} moved to ${newStatus.replace(/_/g, ' ')}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
   };
 
   const getNextStatus = (order) => {
@@ -187,7 +151,7 @@ export default function Orders() {
                     <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-50 relative z-10">
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{order.items} Items</p>
-                        <p className="text-2xl font-black text-slate-900 tracking-tighter">${order.total.toFixed(2)}</p>
+                        <p className="text-2xl font-black text-slate-900 tracking-tighter">${Number(order.total).toFixed(2)}</p>
                       </div>
                       
                       {col.id !== "DELIVERED" && (

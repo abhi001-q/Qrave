@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { adminService } from "../../services/adminService";
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching overarching system metrics
-    setTimeout(() => {
-      setMetrics({
-        totalUsers: 14205,
-        totalManagers: 18,
-        activeOrders: 154,
-        totalRevenue: 845200.5,
-        serverUptime: "99.98%",
-        apiLatency: "45ms",
-      });
-    }, 800);
+    const fetchMetrics = async () => {
+      try {
+        const data = await adminService.getSystemMetrics();
+        setMetrics(data);
+      } catch (err) {
+        console.error("Failed to load admin metrics", err);
+      }
+    };
+    fetchMetrics();
   }, []);
 
   if (!metrics) {

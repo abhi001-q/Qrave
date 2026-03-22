@@ -78,7 +78,7 @@ export default function BillSection() {
                       <span className={`text-xs font-bold uppercase tracking-widest ${selectedOrder === order.id ? 'text-white/60' : 'text-slate-400'}`}>{order.items} Items</span>
                       <span className={`text-[10px] font-medium mt-1 ${selectedOrder === order.id ? 'text-white/40' : 'text-slate-300'}`}>{order.time}</span>
                    </div>
-                   <span className={`text-xl font-black ${selectedOrder === order.id ? 'text-white' : 'text-purple-600'}`}>${order.total.toFixed(2)}</span>
+                   <span className={`text-xl font-black ${selectedOrder === order.id ? 'text-white' : 'text-purple-600'}`}>${Number(order.total).toFixed(2)}</span>
                 </div>
               </div>
             ))}
@@ -193,7 +193,7 @@ export default function BillSection() {
                        <div key={idx} className="flex items-center">
                           <div className="flex-1 min-w-0">
                              <h4 className="font-bold text-slate-900 tracking-tight truncate">{item.name}</h4>
-                             <p className="text-[10px] font-medium text-slate-400">${item.price.toFixed(2)} / unit</p>
+                             <p className="text-[10px] font-medium text-slate-400">${Number(item.price).toFixed(2)} / unit</p>
                           </div>
                           <span className="w-16 text-center font-black text-slate-900">x{item.qty}</span>
                           <span className="w-24 text-right font-black text-slate-900 tracking-tight">${(item.price * item.qty).toFixed(2)}</span>

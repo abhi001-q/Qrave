@@ -36,9 +36,7 @@ export default function Checkout() {
       navigate(`/orders/${response.data?.id || 'success'}`);
     } catch (error) {
       console.error("Order creation failed", error);
-      alert("Failed to place order. Using mock success for now.");
-      clearCart();
-      navigate(`/orders`); // Mock redirect
+      alert(error.response?.data?.message || "Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

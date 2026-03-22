@@ -24,48 +24,13 @@ export default function Products() {
     image: null,
   });
 
-  const mockProducts = [
-    {
-      id: 1,
-      title: "Truffle Ribeye Steak",
-      price: 49.0,
-      category: "Main Course",
-      status: "Active",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      title: "Lobster Ravioli",
-      price: 32.5,
-      category: "Main Course",
-      status: "Active",
-      image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=100&h=100&fit=crop",
-    },
-    {
-      id: 3,
-      title: "Aged Wagyu Burger",
-      price: 28.0,
-      category: "Main Course",
-      status: "Inactive",
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&h=100&fit=crop",
-    },
-    {
-      id: 4,
-      title: "Smoked Old Fashioned",
-      price: 18.0,
-      category: "Drinks",
-      status: "Active",
-      image: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=100&h=100&fit=crop",
-    },
-  ];
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await menuService.getAll();
-        setProducts(response?.length ? response : mockProducts);
-      } catch {
-        setProducts(mockProducts);
+        setProducts(response || []);
+      } catch (err) {
+        toast.error("Failed to load products");
       } finally {
         setLoading(false);
       }
@@ -100,32 +65,54 @@ export default function Products() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const newProduct = {
-      ...formData,
-      id: Date.now(),
-      status: "Active",
-      price: parseFloat(formData.price),
-    };
-    setProducts([newProduct, ...products]);
-    setShowModal(false);
-    setFormData({
-      title: "",
-      price: "",
-      category: categories[0],
-      description: "",
-      image: null,
-    });
-    toast.success("Product added successfully!");
+    try {
+      const newProductData = {
+        ...formData,
+        status: "Active",
+        price: parseFloat(formData.price),
+      };
+      const created = await menuService.create(newProductData);
+      setProducts([created, ...products]);
+      setShowModal(false);
+      setFormData({
+        title: "",
+        price: "",
+        category: categories[0] || "Main Course",
+        description: "",
+        image: null,
+      });
+      toast.success("Product added successfully!");
+    } catch (err) {
+      toast.error("Failed to add product");
+    }
   };
 
-  const toggleStatus = (id) => {
-    setProducts(
-      products.map((p) =>
-        p.id === id
-          ? { ...p, status: p.status === "Active" ? "Inactive" : "Active" }
-          : p,
-      ),
-    );
+  const toggleStatus = async (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const newStatus = product.status === "Active" ? "Inactive" : "Active";
+    try {
+      await menuService.update(id, { ...product, status: newStatus });
+      setProducts(
+        products.map((p) =>
+          p.id === id ? { ...p, status: newStatus } : p
+        )
+      );
+      toast.success(`Status updated to ${newStatus}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this dish?")) return;
+    try {
+      await menuService.remove(id);
+      setProducts(products.filter(p => p.id !== id));
+      toast.success("Product deleted successfully!");
+    } catch (err) {
+      toast.error("Failed to delete product");
+    }
   };
 
   return (
@@ -230,7 +217,7 @@ export default function Products() {
                     </td>
                     <td className="p-8 text-center">
                       <span className="text-lg font-black text-slate-900 tracking-tight">
-                        ${product.price.toFixed(2)}
+                        ${Number(product.price).toFixed(2)}
                       </span>
                     </td>
                     <td className="p-8 text-center">
@@ -255,7 +242,7 @@ export default function Products() {
                             edit_note
                           </span>
                         </button>
-                        <button className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 hover:text-red-500 hover:border-red-200 hover:shadow-lg hover:shadow-red-100 transition-all flex items-center justify-center group/btn">
+                        <button onClick={() => handleDelete(product.id)} className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 hover:text-red-500 hover:border-red-200 hover:shadow-lg hover:shadow-red-100 transition-all flex items-center justify-center group/btn">
                           <span className="material-symbols-outlined text-xl group-hover/btn:rotate-12 transition-transform">
                             delete_outline
                           </span>

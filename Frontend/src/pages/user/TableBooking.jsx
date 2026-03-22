@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { bookingService } from "../../services/bookingService";
+
 export default function TableBooking() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -17,18 +19,15 @@ export default function TableBooking() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulating API Call + Local Storage Sync for Manager Dashboard
-    setTimeout(() => {
-      // Logic to "Reserve" a table for the mock interaction
-      // We'll just mark Table #4 as Reserved as an example
-      const currentBookings = JSON.parse(localStorage.getItem('table_bookings') || '[]');
-      currentBookings.push({ ...formData, tableId: 4, timestamp: Date.now() });
-      localStorage.setItem('table_bookings', JSON.stringify(currentBookings));
-      
-      setIsSubmitting(false);
+    try {
+      await bookingService.create(formData);
       setSuccess(true);
       toast.success("Reservation request sent to the restaurant!");
-    }, 2000);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit booking");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (success) {

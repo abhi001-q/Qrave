@@ -1,6 +1,7 @@
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './utils/toastInterceptor';
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';

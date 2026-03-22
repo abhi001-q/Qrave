@@ -1,41 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { staffService } from "../../services/staffService";
 
 export default function Staff() {
   const [showModal, setShowModal] = useState(false);
-  const [staff, setStaff] = useState([
-    { id: 1, name: "Alexander Pierce", role: "Head Chef", email: "alex@qrave.com", status: "Active", initials: "AP", color: "bg-purple-600" },
-    { id: 2, name: "Sarah Jenkins", role: "General Manager", email: "sarah@qrave.com", status: "Active", initials: "SJ", color: "bg-blue-600" },
-    { id: 3, name: "Marcus Thorne", role: "Senior Server", email: "marcus@qrave.com", status: "Active", initials: "MT", color: "bg-green-600" },
-    { id: 4, name: "Elena Rossi", role: "Waitstaff", email: "elena@qrave.com", status: "Inactive", initials: "ER", color: "bg-orange-600" },
-  ]);
+  const [staff, setStaff] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "Waitstaff",
+    role: "manager", // Default mapped role
   });
 
-  const roles = ["General Manager", "Head Chef", "Senior Server", "Waitstaff", "Bartender"];
+  const roles = [
+    { label: "Manager", value: "manager" },
+    { label: "Admin", value: "admin" }
+  ];
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    const newMember = {
-      id: Date.now(),
-      ...formData,
-      status: "Active",
-      initials: formData.name.split(" ").map(n => n[0]).join("").toUpperCase(),
-      color: "bg-indigo-600"
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const data = await staffService.getAll();
+        // Add dynamic UI features that aren't stored natively 
+        const mappedData = data.map(mem => ({
+          ...mem,
+          initials: mem.name?.split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase() || "ST",
+          color: "bg-indigo-600"
+        }));
+        setStaff(mappedData);
+      } catch (err) {
+        toast.error("Failed to load staff.");
+      } finally {
+        setLoading(false);
+      }
     };
-    setStaff([newMember, ...staff]);
-    setShowModal(false);
-    setFormData({ name: "", email: "", password: "", role: "Waitstaff" });
-    toast.success("Staff member invited successfully!");
+    fetchStaff();
+  }, []);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      const created = await staffService.create(formData);
+      const newMember = {
+        ...created,
+        initials: created.name.split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase(),
+        color: "bg-indigo-600"
+      };
+      setStaff([newMember, ...staff]);
+      setShowModal(false);
+      setFormData({ name: "", email: "", password: "", role: "manager" });
+      toast.success("Staff member invited successfully!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to invite staff member");
+    }
   };
 
-  const toggleStatus = (id) => {
-    setStaff(staff.map(mem => mem.id === id ? { ...mem, status: mem.status === "Active" ? "Inactive" : "Active" } : mem));
+  const toggleStatus = async (id) => {
+    const member = staff.find(m => m.id === id);
+    if (!member) return;
+    const newStatus = member.status === "Active" ? "Inactive" : "Active";
+    
+    try {
+      await staffService.updateStatus(id, newStatus);
+      setStaff(staff.map(mem => mem.id === id ? { ...mem, status: newStatus } : mem));
+      toast.success(`Status updated to ${newStatus}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to completely remove this staff member?")) return;
+    try {
+      await staffService.delete(id);
+      setStaff(staff.filter(mem => mem.id !== id));
+      toast.success("Staff member removed.");
+    } catch (err) {
+      toast.error("Failed to remove staff member");
+    }
   };
 
   return (
@@ -68,7 +112,24 @@ export default function Staff() {
                 </tr>
              </thead>
              <tbody className="divide-y divide-slate-50">
-                {staff.map((member) => (
+                {loading ? (
+                   <tr>
+                     <td colSpan="4" className="p-20 text-center">
+                       <div className="flex flex-col items-center gap-4">
+                         <div className="w-10 h-10 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin"></div>
+                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                           Loading staff...
+                         </p>
+                       </div>
+                     </td>
+                   </tr>
+                ) : staff.length === 0 ? (
+                   <tr>
+                     <td colSpan="4" className="p-20 text-center text-slate-400 font-bold">
+                       No staff members found.
+                     </td>
+                   </tr>
+                ) : staff.map((member) => (
                    <tr key={member.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="p-8">
                          <div className="flex items-center gap-5">
@@ -83,7 +144,7 @@ export default function Staff() {
                       </td>
                       <td className="p-8 text-center">
                          <span className="px-4 py-1.5 bg-slate-50 rounded-xl text-xs font-black text-slate-500 uppercase tracking-widest border border-slate-100">
-                            {member.role}
+                            {member.role === 'admin' ? "Admin" : member.role === 'manager' ? "Manager" : member.role}
                          </span>
                       </td>
                       <td className="p-8 text-center text-sm font-bold text-slate-500">
@@ -104,7 +165,7 @@ export default function Staff() {
                             <button className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 hover:text-purple-600 hover:border-purple-200 hover:shadow-lg hover:shadow-purple-100 transition-all flex items-center justify-center group/btn">
                                <span className="material-symbols-outlined text-xl group-hover/btn:scale-110 transition-transform">edit_note</span>
                             </button>
-                            <button className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 hover:text-red-500 hover:border-red-200 hover:shadow-lg hover:shadow-red-100 transition-all flex items-center justify-center group/btn">
+                            <button onClick={() => handleDelete(member.id)} className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 hover:text-red-500 hover:border-red-200 hover:shadow-lg hover:shadow-red-100 transition-all flex items-center justify-center group/btn">
                                <span className="material-symbols-outlined text-xl group-hover/btn:rotate-12 transition-transform shadow-red-50">delete_outline</span>
                             </button>
                          </div>
@@ -175,8 +236,8 @@ export default function Staff() {
                   onChange={(e) => setFormData({...formData, role: e.target.value})}
                   className="w-full bg-slate-50 border border-slate-100 rounded-3xl px-6 py-4 outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-200 text-slate-900 font-bold transition-all appearance-none"
                 >
-                  {roles.map(role => (
-                    <option key={role}>{role}</option>
+                  {roles.map(r => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
                   ))}
                 </select>
               </div>

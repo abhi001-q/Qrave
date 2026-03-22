@@ -6,6 +6,9 @@ export const orderService = {
   // Hit the correct backend route: /api/orders/my-orders
   getAll: () => api.get('/orders/my-orders').then(r => r.data.data),
   
+  // For managers
+  getAllAsManager: () => api.get('/orders/all').then(r => r.data.data),
+  
   // Client-side find for individual order details since backend lacks getById
   getById: async (id) => {
     const orders = await api.get('/orders/my-orders').then(r => r.data.data);

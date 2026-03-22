@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { bookingService } from "../../services/bookingService";
 
 export default function ManagerDashboard() {
   const [stats, setStats] = useState(null);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating fetching analytical data for the dashboard
-    const fetchDashboardStats = () => {
-      setTimeout(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const bookingsData = await bookingService.getAllAsManager();
+        setBookings(bookingsData.slice(0, 5)); // Show latest 5
+
+        // Simulating other analytical data. 
+        // In a real scenario, this would come from a /analytics endpoint
         setStats({
           todayRevenue: 1245.5,
           ordersToday: 64,
           pendingOrders: 12,
-          tablesOccupied: 8,
+          tablesOccupied: bookingsData.filter(b => b.status === "Confirmed").length,
           totalTables: 20,
           profitMargin: 35, // percentage
         });
+      } catch (err) {
+        console.error("Dashboard failed to load", err);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
-    fetchDashboardStats();
+    fetchDashboardData();
   }, []);
 
   if (loading) {
@@ -157,6 +166,46 @@ export default function ManagerDashboard() {
               </div>
            </div>
         </div>
+      </div>
+
+      {/* Bookings Section */}
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm p-8 flex flex-col mt-8">
+         <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+            <h3 className="text-xl font-extrabold text-slate-900 border-b-4 border-purple-500 pb-2 inline-block">Recent Table Bookings</h3>
+            <Link to="/manager/tables" className="text-xs font-bold text-purple-600 hover:text-purple-700 transition-colors uppercase tracking-widest flex items-center gap-1">
+              View All <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </Link>
+         </div>
+
+         {bookings.length === 0 ? (
+           <div className="text-center py-10 text-slate-400 font-bold">No recent bookings.</div>
+         ) : (
+           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+             {bookings.map(booking => (
+               <div key={booking.id} className="bg-slate-50 rounded-3xl p-6 border border-slate-100 hover:border-purple-200 transition-colors flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white text-purple-600 flex items-center justify-center shadow-sm">
+                     <span className="material-symbols-outlined">deck</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900">{booking.user_name || "Guest Walk-in"}</h4>
+                    <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">
+                      {new Date(booking.booking_time).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+                    </p>
+                    <div className="mt-3 flex items-center gap-3">
+                      <span className="px-3 py-1 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase text-slate-500 tracking-widest shadow-sm">
+                        {booking.guests} Guests
+                      </span>
+                      <span className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                        booking.status === 'Confirmed' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'
+                      }`}>
+                        {booking.status}
+                      </span>
+                    </div>
+                  </div>
+               </div>
+             ))}
+           </div>
+         )}
       </div>
     </div>
   );

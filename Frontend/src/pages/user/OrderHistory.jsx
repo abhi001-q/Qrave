@@ -1,14 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { orderService } from "../../services/orderService";
 
 export default function OrderHistory() {
-  // Dummy data for visual representation
-  const orders = [
-    { id: "ORD-1284", date: "2024-03-15", amount: 154.50, items: 3, status: "Delivered", color: "bg-green-100 text-green-700", trackId: "1284" },
-    { id: "ORD-1283", date: "2024-03-14", amount: 22.00, items: 1, status: "Delivered", color: "bg-green-100 text-green-700", trackId: "1283" },
-    { id: "ORD-1282", date: "2024-03-12", amount: 89.25, items: 5, status: "Cancelled", color: "bg-red-100 text-red-700", trackId: "1282" },
-    { id: "ORD-1281", date: "2024-03-10", amount: 45.00, items: 2, status: "Preparing", color: "bg-orange-100 text-orange-600", trackId: "1281" },
-  ];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await orderService.getAll();
+        
+        // Map backend orders to UI format
+        const formattedOrders = data.map(order => {
+           let statusColor = "bg-orange-100 text-orange-600"; // default Prep/Pending
+           if (order.status === "Delivered" || order.status === "Paid") {
+              statusColor = "bg-green-100 text-green-700";
+           } else if (order.status === "Cancelled" || order.status === "Failed") {
+              statusColor = "bg-red-100 text-red-700";
+           }
+           
+           return {
+             id: `ORD-${order.id}`,
+             trackId: order.id,
+             date: new Date(order.created_at).toLocaleDateString(),
+             amount: order.total_amount,
+             items: order.items?.length || 0,
+             status: order.status,
+             color: statusColor
+           };
+        });
+        
+        setOrders(formattedOrders);
+      } catch (err) {
+        console.error("Failed to load orders", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+     return (
+       <div className="w-full h-[50vh] flex items-center justify-center">
+         <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+       </div>
+     );
+  }
 
   return (
     <div className="space-y-10">
@@ -37,7 +77,11 @@ export default function OrderHistory() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {orders.map((order) => (
+              {orders.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-20 text-center text-slate-400 font-bold">You have no order history yet.</td>
+                </tr>
+              ) : orders.map((order) => (
                 <tr key={order.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="py-6 pl-4">
                     <div className="flex items-center gap-3">
@@ -54,7 +98,7 @@ export default function OrderHistory() {
                     {order.items} items
                   </td>
                   <td className="py-6 text-center">
-                    <span className="font-black text-slate-900">${order.amount.toFixed(2)}</span>
+                    <span className="font-black text-slate-900">${Number(order.amount).toFixed(2)}</span>
                   </td>
                   <td className="py-6 text-center">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${order.color}`}>
@@ -68,9 +112,6 @@ export default function OrderHistory() {
                       </Link>
                       <button title="View Detail" className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all shadow-sm">
                          <span className="material-symbols-outlined text-xl">visibility</span>
-                      </button>
-                      <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-primary transition-all shadow-md shadow-slate-200">
-                         <span className="material-symbols-outlined text-xl">autorenew</span>
                       </button>
                     </div>
                   </td>

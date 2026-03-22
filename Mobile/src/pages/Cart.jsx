@@ -125,7 +125,7 @@ const Cart = () => {
               </div>
               <div className="flex-1 space-y-2">
                 <div className="flex justify-between">
-                  <h4 className="font-black text-slate-800 text-base leading-tight">{item.name}</h4>
+                  <h4 className="font-black text-slate-800 text-base leading-tight">{item.title || item.name}</h4>
                   <button onClick={() => removeItem(item.id)} className="text-red-400">
                     <span className="material-symbols-outlined text-xl">delete</span>
                   </button>
