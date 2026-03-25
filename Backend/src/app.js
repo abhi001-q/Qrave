@@ -20,15 +20,35 @@ const app = express();
 
 // ── Middleware ───────────────────────────────────────────────
 app.use(helmet());
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'https://qrave-web.vercel.app',
+  'https://qrave-mobile.vercel.app'
+];
+
+if (process.env.CLIENT_URL) {
+  const envOrigins = process.env.CLIENT_URL.split(',').map(url => url.trim());
+  allowedOrigins.push(...envOrigins);
+}
+
 app.use(cors({ 
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173', 
-    'http://localhost:5174', 
-    'http://localhost:5175',
-    'https://qrave-web.vercel.app',
-    'https://qrave-mobile.vercel.app'
-  ] 
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    
+    // Check for exact match or match from CLIENT_URL
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Error out if not allowed
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
 }));
+
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -51,6 +71,15 @@ app.use('/api/admin',    adminRoutes);
 
 // ── Health check ─────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'OK', project: 'Qrave' }));
+
+// ── 404 handler ─────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+    hint: 'Ensure your VITE_API_URL in Vercel ends with /api (e.g., https://your-backend.onrender.com/api)'
+  });
+});
 
 // ── Global error handler ─────────────────────────────────────
 app.use(errorHandler);
