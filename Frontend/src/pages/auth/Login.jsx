@@ -56,8 +56,9 @@ export default function Login() {
         });
         toast.success(`Welcome back, ${user.name}!`);
 
-        if (user.role === "admin") navigate("/admin");
-        else if (user.role === "manager" || user.role === "staff") navigate("/manager");
+        const userRole = (user.role || "").toLowerCase();
+        if (userRole === "admin") navigate("/admin");
+        else if (userRole === "manager" || userRole === "staff") navigate("/manager");
         else navigate("/dashboard");
       }
     } catch (err) {

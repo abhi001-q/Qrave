@@ -7,6 +7,7 @@ exports.getAll = async (req, res) => {
     const products = await Product.findAll();
     sendSuccess(res, 200, products);
   } catch (err) {
+    console.error("----- MENU GET_ALL 500 ERROR -----", err);
     sendError(res, 500, err.message);
   }
 };
@@ -34,6 +35,10 @@ exports.create = async (req, res) => {
   try {
     const { title, description, price, category, image, status } = req.body;
     
+    if (!title || price === undefined) {
+      return sendError(res, 400, "Title and price are required");
+    }
+
     let category_id = null;
     if (category) {
       let catRow = await Category.findByName(category);
@@ -59,6 +64,11 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { title, description, price, category, image, status } = req.body;
+    
+    if (!title || price === undefined) {
+      return sendError(res, 400, "Title and price are required");
+    }
+
     let category_id = null;
     if (category) {
       let catRow = await Category.findByName(category);

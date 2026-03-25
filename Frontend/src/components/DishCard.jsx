@@ -4,7 +4,7 @@ import { useCart } from "../hooks/useCart";
 export default function DishCard({ id, name, title, price, image, description }) {
   const { addItem } = useCart();
   const displayName = name || title || "Untitled Dish";
-  const displayPrice = typeof price === 'number' ? `$${price.toFixed(2)}` : price;
+  const displayPrice = typeof price === 'number' ? `Rs. ${price.toFixed(2)}` : price;
 
   return (
     <div className="bg-white border border-slate-100 rounded-[32px] overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col h-full relative cursor-pointer shadow-sm">

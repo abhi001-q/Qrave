@@ -24,7 +24,8 @@ export default function AdminLogin() {
     try {
       const user = await login(form);
 
-      if (user.role !== "admin") {
+      const userRole = (user.role || "").toLowerCase();
+      if (userRole !== "admin") {
         toast.error("Access denied: Not an administrator");
         return;
       }

@@ -19,7 +19,7 @@ const MobileLayout = ({ children }) => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 h-24 bg-white/90 backdrop-blur-xl border-t border-slate-50 z-[100] flex items-center justify-around px-4 shadow-sm">
+      <nav className="fixed bottom-0 left-0 right-0 h-24 bg-white/90 backdrop-blur-xl border-t border-slate-50 z-[1000] flex items-center justify-around px-4 shadow-sm">
         {navItems.map((item) => (
           <Link
             key={item.path}

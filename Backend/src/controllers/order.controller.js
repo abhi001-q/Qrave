@@ -1,9 +1,25 @@
 const Order = require("../models/order.model");
 const { sendSuccess, sendError } = require("../utils/apiResponse");
+const fs = require('fs');
+const path = require('path');
+const debugLog = path.join(__dirname, '../../debug.log');
 
 exports.createOrder = async (req, res) => {
   try {
-    const { tableId, totalAmount, items, orderType, paymentMethod, delivery_location, delivery_zip } = req.body;
+    let { tableId, totalAmount, items, orderType, paymentMethod, delivery_location, delivery_zip } = req.body;
+    console.log("---- INCOMING ORDER PAYLOAD ----", req.body);
+    
+    // Normalize orderType for ENUM('Dine-in', 'Delivery')
+    if (orderType === "Dine In") orderType = "Dine-in";
+    if (!orderType) orderType = "Dine-in";
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return sendError(res, 400, "Order must contain at least one item");
+    }
+
+    if (totalAmount == null || isNaN(Number(totalAmount))) {
+      return sendError(res, 400, `Invalid or missing totalAmount. Received: ${totalAmount}. Keys: ${Object.keys(req.body).join(', ')}`);
+    }
+    
     const orderId = await Order.create({
       user_id: req.user?.id || null,
       table_id: tableId || null,
@@ -35,13 +51,15 @@ exports.getAllOrders = async (req, res) => {
     const orders = await Order.findAllAsManager();
     const formatted = orders.map(o => ({
       id: o.id.toString(),
-      table: o.table_number,
-      status: o.status,
+      table: o.table_number || o.table_id,
+      status: (o.status || 'PENDING').toUpperCase(),
       items: o.items_count || 0,
       total: parseFloat(o.total_amount),
       time: new Date(o.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-      type: o.orderType,
-      customer: o.orderType === 'Delivery' ? { name: o.customer_name || 'Guest', phone: o.customer_phone || '', address: o.delivery_location || 'N/A' } : null
+      type: o.order_type || o.orderType || 'Dine-in',
+      customer: (o.order_type || o.orderType) === 'Delivery' 
+        ? { name: o.customer_name || 'Guest', phone: '', address: o.delivery_location || 'N/A' } 
+        : null
     }));
     sendSuccess(res, 200, formatted);
   } catch (err) {
@@ -53,8 +71,29 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    await Order.updateStatus(id, status);
+    const userDisplay = req.user ? JSON.stringify(req.user) : 'Guest User';
+    const logMsg = `[${new Date().toISOString()}] UPDATE STATUS: id=${id}, status=${status}, user=${userDisplay}\n`;
+    fs.appendFileSync(debugLog, logMsg);
+    
+    if (!status) return sendError(res, 400, 'Status is required');
+    await Order.updateStatus(id, status.toLowerCase());
     sendSuccess(res, 200, null, "Order status updated");
+  } catch (err) {
+    const errMsg = `[${new Date().toISOString()}] ERROR: ${err.stack}\n`;
+    fs.appendFileSync(debugLog, errMsg);
+    sendError(res, 500, err.message);
+  }
+};
+
+exports.updateTransactionId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { transaction_uuid } = req.body;
+    
+    if (!transaction_uuid) return sendError(res, 400, 'transaction_uuid is required');
+    
+    await Order.updateTransactionId(id, transaction_uuid);
+    sendSuccess(res, 200, null, "Order transaction UUID updated");
   } catch (err) {
     sendError(res, 500, err.message);
   }

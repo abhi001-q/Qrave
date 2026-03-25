@@ -20,7 +20,15 @@ const app = express();
 
 // ── Middleware ───────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'] }));
+app.use(cors({ 
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'https://qrave-web.vercel.app',
+    'https://qrave-mobile.vercel.app'
+  ] 
+}));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));

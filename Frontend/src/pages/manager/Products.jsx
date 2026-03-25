@@ -217,7 +217,7 @@ export default function Products() {
                     </td>
                     <td className="p-8 text-center">
                       <span className="text-lg font-black text-slate-900 tracking-tight">
-                        ${Number(product.price).toFixed(2)}
+                        Rs. {Number(product.price).toFixed(2)}
                       </span>
                     </td>
                     <td className="p-8 text-center">
@@ -295,7 +295,7 @@ export default function Products() {
 
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">
-                    Price ($)
+                    Price (Rs.)
                   </label>
                   <input
                     required

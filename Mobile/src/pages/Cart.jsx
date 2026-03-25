@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { paymentService } from "../services/paymentService";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState(() => {
@@ -43,16 +44,67 @@ const Cart = () => {
     if (!selectedTable) return alert("Please enter a table number");
     setIsPlacing(true);
     try {
-      await api.post("/orders", {
-        table_id: selectedTable,
-        total_amount: total,
-        payment_method: paymentMethod,
+      const res = await api.post("/orders", {
+        tableId: selectedTable,
+        totalAmount: total.toFixed(2),
+        paymentMethod: paymentMethod,
+        orderType: "Dine-in",
         items: cartItems.map(item => ({
-          product_id: item.id,
+          productId: item.id,
           quantity: item.quantity,
           price: item.price
         }))
       });
+      
+      const orderId = res.data.data.id;
+
+      if (paymentMethod === "eSewa") {
+        const timestamp = Date.now();
+        const transaction_uuid = `QRV-${orderId}-${timestamp}`;
+        
+        console.log("MOBILE: Initiating eSewa with UUID:", transaction_uuid);
+        
+        // Store UUID in backend
+        await api.patch(`/orders/${orderId}/transaction`, { transaction_uuid });
+
+        const amount = subtotal.toFixed(2);
+        const tax_amount = vat.toFixed(2);
+        const product_delivery_charge = deliveryFee.toFixed(2);
+        const total_amount = total.toFixed(2);
+        
+        const signature = paymentService.generateSignature(total_amount, transaction_uuid);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = paymentService.getFormUrl();
+
+        const fields = {
+          amount,
+          tax_amount,
+          total_amount,
+          transaction_uuid,
+          product_code: paymentService.getMerchantId(),
+          product_service_charge: 0,
+          product_delivery_charge,
+          success_url: `${window.location.origin}/payment/success`,
+          failure_url: `${window.location.origin}/payment/failure`,
+          signed_field_names: "total_amount,transaction_uuid,product_code",
+          signature
+        };
+
+        for (const key in fields) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = fields[key];
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        return;
+      }
+
       localStorage.removeItem("cart");
       setCartItems([]);
       navigate("/orders");
@@ -65,8 +117,6 @@ const Cart = () => {
 
   const payments = [
     { id: "eSewa", icon: "payments", color: "text-emerald-500", bg: "bg-emerald-50" },
-    { id: "Khalti", icon: "wallet", color: "text-purple-500", bg: "bg-purple-50" },
-    { id: "Card Pay", icon: "credit_card", color: "text-orange-500", bg: "bg-orange-50" },
     { id: "Cash", icon: "payments", color: "text-slate-500", bg: "bg-slate-50" },
   ];
 
@@ -86,13 +136,13 @@ const Cart = () => {
   }
 
   return (
-    <div className="p-6 space-y-10 pb-32">
+    <div className="min-h-screen flex flex-col bg-slate-50/30 p-6 space-y-10 pb-40">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link to="/" className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm">
           <span className="material-symbols-outlined font-black">arrow_back</span>
         </Link>
-        <h2 className="text-2xl font-black text-slate-900">Your Cart</h2>
+        <h2 className="text-2xl font-black text-slate-900">Your Cart <span className="text-[8px] text-slate-300">v2.1</span></h2>
       </div>
 
       {/* Table Number */}
@@ -178,7 +228,7 @@ const Cart = () => {
         <div className="space-y-3">
           <div className="flex justify-between text-slate-500 font-bold text-sm px-1">
             <span>Subtotal</span>
-            <span>Rs. {total}</span>
+            <span>Rs. {subtotal}</span>
           </div>
           <div className="flex justify-between text-slate-500 font-bold text-sm px-1">
             <span>Delivery Fee</span>
@@ -199,14 +249,14 @@ const Cart = () => {
         </div>
       </div>
 
-      {/* Sticky Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-slate-100 z-50">
+      {/* Sticky Bottom Button - Positioned ABOVE MobileLayout's nav bar */}
+      <div className="fixed bottom-24 left-0 right-0 p-6 bg-white/95 backdrop-blur-md border-t border-slate-100 z-[1001] shadow-2xl">
         <button 
           onClick={handleCheckout}
           disabled={isPlacing}
           className="btn-primary w-full shadow-2xl relative overflow-hidden group"
         >
-          {isPlacing ? "Processing..." : "Place Order & Pay"}
+          {isPlacing ? "Processing..." : "Confirm Order / Pay Now"}
           <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
         </button>
       </div>

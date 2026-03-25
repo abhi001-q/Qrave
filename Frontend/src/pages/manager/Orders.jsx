@@ -39,7 +39,7 @@ export default function Orders() {
   };
 
   const getNextStatus = (order) => {
-    if (order.type === "Dine-in") {
+    if (order.type?.toLowerCase().includes("dine")) {
       const sequence = ["PENDING", "PREPARING", "READY", "DELIVERED"];
       const idx = sequence.indexOf(order.status);
       return sequence[idx + 1] || order.status;
@@ -121,9 +121,9 @@ export default function Orders() {
                                  <p className="text-[10px] text-purple-600 uppercase tracking-widest font-black">Tracking Live</p>
                               </div>
                             )}
-                            {(order.status !== 'READY' || order.type !== 'Delivery') && order.status !== 'OUT_FOR_DELIVERY' && (
+                            {(order.status !== 'READY' || !order.type?.toLowerCase().includes("delivery")) && order.status !== 'OUT_FOR_DELIVERY' && (
                               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">
-                                {order.type === "Dine-in" ? `Table ${order.table}` : "Home Delivery"}
+                                {order.type?.toLowerCase().includes("dine") ? `Table ${order.table}` : "Home Delivery"}
                               </p>
                             )}
                          </div>
@@ -151,7 +151,7 @@ export default function Orders() {
                     <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-50 relative z-10">
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{order.items} Items</p>
-                        <p className="text-2xl font-black text-slate-900 tracking-tighter">${Number(order.total).toFixed(2)}</p>
+                        <p className="text-2xl font-black text-slate-900 tracking-tighter">Rs. {Number(order.total).toFixed(2)}</p>
                       </div>
                       
                       {col.id !== "DELIVERED" && (

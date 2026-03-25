@@ -17,4 +17,5 @@ export const orderService = {
   },
 
   updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }).then(r => r.data.data),
+  updateTransactionId: (id, transaction_uuid) => api.patch(`/orders/${id}/transaction`, { transaction_uuid }).then(r => r.data.data),
 };

@@ -6,3 +6,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Qrave server running on port ${PORT}`);
 });
+
+// Force keep-alive to debug why it's exiting cleanly
+setInterval(() => {}, 3600000);

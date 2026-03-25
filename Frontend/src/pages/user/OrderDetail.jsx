@@ -117,7 +117,7 @@ export default function OrderDetail() {
                     <h4 className="font-bold">{item.title}</h4>
                     <p className="text-sm text-white/50">Qty: {item.quantity}</p>
                   </div>
-                  <p className="font-bold text-orange-400">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-bold text-orange-400">Rs. {(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -130,15 +130,15 @@ export default function OrderDetail() {
             <div className="space-y-3 text-sm text-white/70">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${(order.totalAmount / 1.1).toFixed(2)}</span>
+                <span>Rs. {(order.totalAmount / 1.1).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax & Fees</span>
-                <span>${(order.totalAmount - (order.totalAmount / 1.1)).toFixed(2)}</span>
+                <span>Rs. {(order.totalAmount - (order.totalAmount / 1.1)).toFixed(2)}</span>
               </div>
               <div className="pt-3 mt-3 border-t border-white/5 flex justify-between items-center text-white">
                 <span className="font-bold text-lg">Total</span>
-                <span className="font-black text-2xl text-orange-500">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                <span className="font-black text-2xl text-orange-500">Rs. {parseFloat(order.totalAmount).toFixed(2)}</span>
               </div>
             </div>
           </div>

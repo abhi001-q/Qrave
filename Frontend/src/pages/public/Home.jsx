@@ -136,7 +136,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase">Latest Order</p>
-                  <p className="text-sm font-extrabold text-slate-900">Pizza Margherita • $12.99</p>
+                  <p className="text-sm font-extrabold text-slate-900">Pizza Margherita • Rs. 12.99</p>
                 </div>
               </div>
             </div>

@@ -8,7 +8,7 @@ export default function UserDashboard() {
   const stats = [
     { name: "Total Orders", value: "12", icon: "receipt_long", color: "text-primary", bg: "bg-orange-50" },
     { name: "Live Vouchers", value: "05", icon: "confirmation_number", color: "text-green-600", bg: "bg-green-50" },
-    { name: "Spend Log", value: "$420", icon: "payments", color: "text-blue-600", bg: "bg-blue-50" },
+    { name: "Spend Log", value: "Rs. 420", icon: "payments", color: "text-blue-600", bg: "bg-blue-50" },
     { name: "Rewards", value: "850", icon: "stars", color: "text-purple-600", bg: "bg-purple-50" },
   ];
 
@@ -63,7 +63,7 @@ export default function UserDashboard() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-slate-900 group-hover:text-primary transition-colors">Pizza Margherita Delivered</h4>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">ORD-4829 • 2 hrs ago • $14.50</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">ORD-4829 • 2 hrs ago • Rs. 14.50</p>
               </div>
               <div className="text-right">
                  <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest">Delivered</span>
@@ -91,7 +91,7 @@ export default function UserDashboard() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-slate-900 group-hover:text-primary transition-colors">Order Under Preparation</h4>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">ORD-9102 • 15 mins ago • $22.00</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">ORD-9102 • 15 mins ago • Rs. 22.00</p>
               </div>
               <div className="text-right">
                  <span className="px-3 py-1 rounded-full bg-orange-100 text-primary text-[10px] font-black uppercase tracking-widest">Preparing</span>
@@ -105,7 +105,7 @@ export default function UserDashboard() {
            <div className="bg-primary p-8 rounded-[40px] text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="relative z-10 text-center">
-                 <h4 className="text-2xl font-black mb-4">Refer a friend & get $10</h4>
+                 <h4 className="text-2xl font-black mb-4">Refer a friend & get Rs. 1000</h4>
                  <p className="text-white/80 text-sm font-medium mb-8 leading-relaxed">Share your code and get rewards on every successful signup and order.</p>
                  <button className="w-full bg-white text-primary py-4 rounded-2xl font-black hover:bg-slate-50 transition-all active:scale-95 shadow-lg">
                     Invite Now

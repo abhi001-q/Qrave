@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { bookingService } from "../../services/bookingService";
 
 export default function Tables() {
   const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
@@ -14,23 +15,30 @@ export default function Tables() {
     { id: 6, number: 6, capacity: 6, status: "Occupied" },
   ]);
 
-  // Simulated Sync with User Table Booking
-  React.useEffect(() => {
-    const syncBookings = () => {
-      const bookings = JSON.parse(localStorage.getItem('table_bookings') || '[]');
-      if (bookings.length > 0) {
-        setTables(prev => prev.map(table => {
-          // If there's a booking for this table number, mark as Reserved
-          const isReserved = bookings.some(b => b.tableId === table.number);
-          if (isReserved && table.status === "Available") {
-            return { ...table, status: "Reserved" };
-          }
-          return table;
-        }));
+  // Live Sync with bookings
+  useEffect(() => {
+    const syncBookings = async () => {
+      try {
+        const bookings = await bookingService.getAllAsManager();
+        if (bookings && bookings.length > 0) {
+          setTables(prev => prev.map(table => {
+            // Find active bookings (e.g. Confirmed or Pending) for the table
+            const activeBooking = bookings.find(b => 
+              b.table_id === table.number && (b.status === "Confirmed" || b.status === "Pending")
+            );
+            
+            if (activeBooking && table.status === "Available") {
+              return { ...table, status: "Reserved" };
+            }
+            return table;
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to sync bookings:", err);
       }
     };
 
-    const interval = setInterval(syncBookings, 3000); // Check every 3 seconds
+    const interval = setInterval(syncBookings, 10000); // Check every 10 seconds
     syncBookings(); // Initial check
     return () => clearInterval(interval);
   }, []);

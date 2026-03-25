@@ -45,7 +45,7 @@ export default function ManagerLayout() {
           </Link>
         </div>
 
-        <div className="flex-1 py-10 px-6 flex flex-col gap-1.5 overflow-y-auto">
+        <div className="flex-1 py-10 px-6 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar">
           <p className="px-4 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4 text-center">Operation Management</p>
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;

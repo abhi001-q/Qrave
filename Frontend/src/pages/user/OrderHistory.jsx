@@ -98,7 +98,7 @@ export default function OrderHistory() {
                     {order.items} items
                   </td>
                   <td className="py-6 text-center">
-                    <span className="font-black text-slate-900">${Number(order.amount).toFixed(2)}</span>
+                    <span className="font-black text-slate-900">Rs. {Number(order.amount).toFixed(2)}</span>
                   </td>
                   <td className="py-6 text-center">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${order.color}`}>

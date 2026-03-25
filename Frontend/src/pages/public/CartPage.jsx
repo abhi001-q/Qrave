@@ -52,7 +52,7 @@ export default function CartPage() {
                   </button>
                 </div>
                 
-                <p className="text-orange-400 font-bold mb-4">${Number(item.price).toFixed(2)}</p>
+                <p className="text-orange-400 font-bold mb-4">Rs. {Number(item.price).toFixed(2)}</p>
                 
                 <div className="flex items-center gap-4 mt-auto">
                   <div className="flex items-center bg-[#050505] rounded-full border border-white/10">
@@ -61,7 +61,7 @@ export default function CartPage() {
                     <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-white transition-colors">+</button>
                   </div>
                   <div className="text-white/50 text-sm font-medium">
-                    Total: <span className="text-white">${(item.price * item.qty).toFixed(2)}</span>
+                    Total: <span className="text-white">Rs. {(item.price * item.qty).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -76,17 +76,17 @@ export default function CartPage() {
             <div className="space-y-4 mb-8 text-white/70">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-white">${total.toFixed(2)}</span>
+                <span className="text-white">Rs. {total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Taxes & Fees (10%)</span>
-                <span className="text-white">${(total * 0.1).toFixed(2)}</span>
+                <span className="text-white">Rs. {(total * 0.1).toFixed(2)}</span>
               </div>
             </div>
             
             <div className="flex justify-between items-center mb-8 pt-4 border-t border-white/5">
               <span className="text-lg font-bold">Total</span>
-              <span className="text-3xl font-black text-orange-500">${(total * 1.1).toFixed(2)}</span>
+              <span className="text-3xl font-black text-orange-500">Rs. {(total * 1.1).toFixed(2)}</span>
             </div>
             
             <button 

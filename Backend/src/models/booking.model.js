@@ -5,15 +5,14 @@ const Booking = {
     // Construct DATETIME from date and time
     const bookingDateTime = `${data.date} ${data.time}:00`;
     const [result] = await pool.query(
-      `INSERT INTO bookings (user_id, table_id, booking_time, guests, status, special_requests)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO bookings (user_id, table_id, booking_time, guests, status)
+       VALUES (?, ?, ?, ?, ?)`,
       [
         data.user_id,
         null, // table_id assigned later
         bookingDateTime,
         data.guests,
-        "Confirmed", // Auto confirmed for now
-        data.specialRequests || null
+        "Confirmed" // Auto confirmed for now
       ]
     );
     return result.insertId;

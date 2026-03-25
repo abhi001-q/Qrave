@@ -36,29 +36,31 @@ export default function CartPanel() {
     try {
       // 1. Create order in backend first
       const orderData = {
-        // Map items to backend model (product_id, quantity, price)
+        // Map items to backend model (productId, quantity, price)
         items: items.map(i => ({ 
-          product_id: i.id, 
+          productId: i.id, 
           quantity: i.quantity,
           price: i.price 
         })),
         orderType,
         paymentMethod,
-        // Backend expects 'table_id' (numeric) and 'total_amount'
-        table_id: orderType === "Dine In" ? parseInt(tableNo.replace("T-", "")) : null,
-        total_amount: (total * 1.13).toFixed(2),
+        // Backend expects 'tableId' (numeric) and 'totalAmount'
+        tableId: orderType === "Dine In" ? parseInt(tableNo.replace("T-", "")) : null,
+        totalAmount: (total * 1.13).toFixed(2),
         delivery_location: deliveryDetails.location,
         delivery_zip: deliveryDetails.zipCode
       };
 
-      const { orderId } = await orderService.create(orderData);
+      const { id: orderId } = await orderService.create(orderData);
       
       // 2. Handle eSewa Redirection
       if (paymentMethod === "eSewa") {
-        const transaction_uuid = `QRV-${orderId}`;
+        const transaction_uuid = `QRV-${orderId}-${Date.now()}`;
+        
+        // Store the transaction_uuid in backend
+        await orderService.updateTransactionId(orderId, transaction_uuid);
         
         // eSewa v2 requires: total_amount = amount + tax_amount + service_charge + delivery_charge
-        // We ensure this by calculating them separately and then summing the strings
         const amount = total.toFixed(2);
         const tax_amount = (total * 0.13).toFixed(2);
         const total_amount = (parseFloat(amount) + parseFloat(tax_amount)).toFixed(2);
@@ -207,7 +209,7 @@ export default function CartPanel() {
       </div>
 
       {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto px-8 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto min-h-0 px-8 custom-scrollbar">
         {items.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center opacity-40 text-center">
             <div className="w-16 h-16 rounded-[28px] bg-slate-100 flex items-center justify-center text-slate-300 mb-4">
@@ -235,7 +237,7 @@ export default function CartPanel() {
                     {item.title}
                   </h4>
                   <p className="text-[11px] font-bold text-primary">
-                    ${Number(item.price).toFixed(2)}
+                    Rs. {Number(item.price).toFixed(2)}
                   </p>
                 </div>
                 <div className="flex items-center bg-slate-50 border border-slate-100 rounded-xl p-1 shadow-inner">
@@ -319,7 +321,7 @@ export default function CartPanel() {
               Subtotal
             </span>
             <span className="text-slate-600 font-black text-sm tracking-tighter italic">
-              ${total.toFixed(2)}
+              Rs. {total.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center">
@@ -327,7 +329,7 @@ export default function CartPanel() {
               Tax (13%)
             </span>
             <span className="text-slate-600 font-black text-sm tracking-tighter italic">
-              ${(total * 0.13).toFixed(2)}
+              Rs. {(total * 0.13).toFixed(2)}
             </span>
           </div>
           <div className="h-px bg-slate-100 my-6 relative overflow-hidden">
@@ -339,7 +341,7 @@ export default function CartPanel() {
             </span>
             <div className="flex flex-col items-end">
               <span className="text-primary font-black text-4xl tracking-tighter leading-none">
-                ${(total * 1.13).toFixed(2)}
+                Rs. {(total * 1.13).toFixed(2)}
               </span>
             </div>
           </div>

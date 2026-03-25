@@ -30,8 +30,8 @@ export default function Analytics() {
   }
 
   const kpis = [
-    { name: "Gross Revenue", value: `$${Number(analytics.grossRevenue).toLocaleString()}`, trend: "Stable", color: "text-purple-600", bg: "bg-purple-50", icon: "payments" },
-    { name: "Avg. Order Value", value: `$${Number(analytics.avgOrderValue).toFixed(2)}`, trend: "Stable", color: "text-blue-600", bg: "bg-blue-50", icon: "shopping_bag" },
+    { name: "Gross Revenue", value: `Rs. ${Number(analytics.grossRevenue).toLocaleString()}`, trend: "Stable", color: "text-purple-600", bg: "bg-purple-50", icon: "payments" },
+    { name: "Avg. Order Value", value: `Rs. ${Number(analytics.avgOrderValue).toFixed(2)}`, trend: "Stable", color: "text-blue-600", bg: "bg-blue-50", icon: "shopping_bag" },
     { name: "Total Orders", value: Number(analytics.totalOrders).toLocaleString(), trend: "Growing", color: "text-green-600", bg: "bg-green-50", icon: "receipt_long" },
     { name: "New Customers", value: Number(analytics.newCustomers).toLocaleString(), trend: "Last 30D", color: "text-orange-600", bg: "bg-orange-50", icon: "person_add" },
   ];
@@ -123,7 +123,7 @@ export default function Analytics() {
                       style={{ height: `${h}%` }}
                      >
                        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded-lg text-[10px] font-black text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                          ${Number(chartBars[i]?.total || 0).toFixed(2)}
+                          Rs. {Number(chartBars[i]?.total || 0).toFixed(2)}
                        </div>
                      </div>
                   </div>
@@ -151,7 +151,7 @@ export default function Analytics() {
                    <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-end mb-2">
                          <h4 className="text-sm font-black text-slate-900 group-hover:text-purple-600 transition-colors uppercase tracking-tight">{item.name}</h4>
-                         <span className="text-[10px] font-black text-purple-600">${Number(item.revenue).toFixed(2)}/unit</span>
+                         <span className="text-[10px] font-black text-purple-600">Rs. {Number(item.revenue).toFixed(2)}/unit</span>
                       </div>
                       <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
                          <div className={`h-full ${item.color || 'bg-purple-600'} rounded-full transition-all duration-1000 ease-out`} style={{ width: `${(Math.random() * 50) + 50}%` }}></div>

@@ -346,17 +346,4 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-/* Custom scrollbar style */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #ec5b13;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #d14d0d;
-}
+/* Global scrollbar handled in index.css */

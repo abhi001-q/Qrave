@@ -8,7 +8,14 @@ import { useAuth } from '../hooks/useAuth';
 export default function RoleRoute({ roles }) {
   const { user } = useAuth();
 
-  if (!user || !roles.includes(user.role)) {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const userRole = (user.role || "").toLowerCase();
+  const allowedRoles = roles.map(r => r.toLowerCase());
+
+  if (!allowedRoles.includes(userRole)) {
     return <Navigate to="/login" replace />;
   }
 
