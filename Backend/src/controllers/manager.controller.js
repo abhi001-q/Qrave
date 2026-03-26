@@ -3,10 +3,34 @@ const { sendSuccess, sendError } = require("../utils/apiResponse");
 
 exports.getAnalytics = async (req, res) => {
   try {
-    // 1. Basic KPIs
+    // 1. Basic KPIs (All-time vs Today)
     const [[{ gross_revenue: grossRevenue }]] = await pool.query(
-      "SELECT COALESCE(SUM(total_amount), 0) as gross_revenue FROM orders WHERE status = 'delivered'"
+      "SELECT COALESCE(SUM(total_amount), 0) as gross_revenue FROM orders WHERE status = 'DELIVERED'"
     );
+    
+    // TODAY'S REVENUE
+    const [[{ today_revenue: todayRevenue }]] = await pool.query(
+      "SELECT COALESCE(SUM(total_amount), 0) as today_revenue FROM orders WHERE status = 'DELIVERED' AND DATE(created_at) = CURDATE()"
+    );
+
+    // ORDERS TODAY
+    const [[{ orders_today: ordersToday }]] = await pool.query(
+      "SELECT COUNT(*) as orders_today FROM orders WHERE DATE(created_at) = CURDATE()"
+    );
+
+    // PENDING ORDERS (Active)
+    const [[{ pending_orders: pendingOrders }]] = await pool.query(
+      "SELECT COUNT(*) as pending_orders FROM orders WHERE status NOT IN ('DELIVERED', 'CANCELLED')"
+    );
+
+    // TABLE OCCUPANCY
+    const [[{ tables_occupied: tablesOccupied }]] = await pool.query(
+      "SELECT COUNT(*) as tables_occupied FROM tables WHERE status = 'Occupied'"
+    );
+    const [[{ total_tables: totalTables }]] = await pool.query(
+      "SELECT COUNT(*) as total_tables FROM tables"
+    );
+
     const [[{ total_orders: totalOrders }]] = await pool.query("SELECT COUNT(*) as total_orders FROM orders");
     const [[{ new_customers: newCustomers }]] = await pool.query(
       "SELECT COUNT(*) as new_customers FROM users WHERE role = 'user' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
@@ -23,8 +47,8 @@ exports.getAnalytics = async (req, res) => {
       ORDER BY date ASC
     `);
 
-    // 3. Top Performers (Parsing JSON items column)
-    const [ordersWithItems] = await pool.query("SELECT items FROM orders WHERE status = 'delivered'");
+    // 3. Top Performers
+    const [ordersWithItems] = await pool.query("SELECT items FROM orders WHERE status = 'DELIVERED'");
     const itemMap = {};
 
     ordersWithItems.forEach(row => {
@@ -49,6 +73,11 @@ exports.getAnalytics = async (req, res) => {
 
     sendSuccess(res, 200, {
       grossRevenue,
+      todayRevenue,
+      ordersToday,
+      pendingOrders,
+      tablesOccupied,
+      totalTables,
       avgOrderValue,
       totalOrders,
       newCustomers,

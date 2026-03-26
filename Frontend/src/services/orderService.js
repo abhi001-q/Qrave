@@ -9,12 +9,8 @@ export const orderService = {
   // For managers
   getAllAsManager: () => api.get('/orders/all').then(r => r.data.data),
   
-  // Client-side find for individual order details since backend lacks getById
-  getById: async (id) => {
-    const orders = await api.get('/orders/my-orders').then(r => r.data.data);
-    const order = (orders || []).find(o => String(o.id) === String(id));
-    return { data: order };
-  },
+  // Fix: Hit the correct backend route /api/orders/:id instead of filtering client-side
+  getById: (id) => api.get(`/orders/${id}`).then(r => r.data),
 
   updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }).then(r => r.data.data),
   updateTransactionId: (id, transaction_uuid) => api.patch(`/orders/${id}/transaction`, { transaction_uuid }).then(r => r.data.data),

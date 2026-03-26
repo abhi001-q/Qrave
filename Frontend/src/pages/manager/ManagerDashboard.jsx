@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { bookingService } from "../../services/bookingService";
+import { managerService } from "../../services/managerService";
 
 export default function ManagerDashboard() {
   const [stats, setStats] = useState(null);
@@ -10,18 +11,20 @@ export default function ManagerDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const bookingsData = await bookingService.getAllAsManager();
-        setBookings(bookingsData.slice(0, 5)); // Show latest 5
+        const [bookingsData, analyticsData] = await Promise.all([
+          bookingService.getAllAsManager(),
+          managerService.getAnalytics()
+        ]);
+        
+        setBookings(bookingsData.slice(0, 5));
 
-        // Simulating other analytical data. 
-        // In a real scenario, this would come from a /analytics endpoint
         setStats({
-          todayRevenue: 1245.5,
-          ordersToday: 64,
-          pendingOrders: 12,
-          tablesOccupied: bookingsData.filter(b => b.status === "Confirmed").length,
-          totalTables: 20,
-          profitMargin: 35, // percentage
+          todayRevenue: analyticsData.todayRevenue || 0,
+          ordersToday: analyticsData.ordersToday || 0,
+          pendingOrders: analyticsData.pendingOrders || 0,
+          tablesOccupied: analyticsData.tablesOccupied || 0,
+          totalTables: analyticsData.totalTables || 20,
+          profitMargin: 35,
         });
       } catch (err) {
         console.error("Dashboard failed to load", err);
@@ -29,11 +32,10 @@ export default function ManagerDashboard() {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 
-  if (loading) {
+  if (loading || !stats) {
     return (
       <div className="w-full flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
@@ -42,10 +44,10 @@ export default function ManagerDashboard() {
   }
 
   const coreMetrics = [
-    { name: "Today's Revenue", value: `$${stats.todayRevenue.toFixed(2)}`, trend: "+14.5%", icon: "payments", color: "text-green-600", bg: "bg-green-50" },
+    { name: "Today's Revenue", value: `Rs. ${Number(stats.todayRevenue).toFixed(2)}`, trend: "+14.5%", icon: "payments", color: "text-green-600", bg: "bg-green-50" },
     { name: "Orders Completed", value: stats.ordersToday, trend: "Stable", icon: "done_all", color: "text-blue-600", bg: "bg-blue-50" },
     { name: "Pending Orders", value: stats.pendingOrders, trend: "Action Req.", icon: "pending_actions", color: "text-orange-600", bg: "bg-orange-50", animate: true },
-    { name: "Table Occupancy", value: `${stats.tablesOccupied}/${stats.totalTables}`, trend: "40% Util.", icon: "event_seat", color: "text-purple-600", bg: "bg-purple-50" },
+    { name: "Table Occupancy", value: `${stats.tablesOccupied}/${stats.totalTables}`, trend: `${Math.round((stats.tablesOccupied / stats.totalTables) * 100)}% Util.`, icon: "event_seat", color: "text-purple-600", bg: "bg-purple-50" },
   ];
 
   return (
