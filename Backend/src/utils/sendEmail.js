@@ -44,7 +44,11 @@ async function sendEmail({ to, subject, text, html }) {
     console.log("Email sent successfully:", info.messageId);
     return info;
   } catch (error) {
-    console.error("Email Sending Failed:", error);
+    console.error("SMTP Error Details:");
+    console.error("- Message:", error.message);
+    console.error("- Code:", error.code);
+    console.error("- Command:", error.command);
+    console.error("- Response:", error.response);
     throw error;
   }
 }
