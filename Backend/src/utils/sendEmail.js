@@ -6,7 +6,8 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    // Automatically strip spaces from App Passwords if present
+    pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '',
   },
   connectionTimeout: 10000, // 10 seconds timeout
 });
