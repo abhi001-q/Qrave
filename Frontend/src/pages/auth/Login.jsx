@@ -38,7 +38,6 @@ export default function Login() {
 
         const { authService } = await import("../../services/authService");
         await authService.register({ ...formData, role });
-        await authService.sendOtp(formData.email);
 
         toast.success("Account created! Please verify OTP sent to your email.");
         navigate("/verify-otp", { state: { email: formData.email } });

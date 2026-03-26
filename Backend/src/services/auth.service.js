@@ -9,32 +9,44 @@ const authService = {
     // Check if email already exists
     const existing = await User.findByEmail(email);
     if (existing) {
-      const err = new Error("Email already registered");
-      err.status = 409;
-      throw err;
+      if (existing.is_active) {
+        const err = new Error("Email already registered");
+        err.status = 409;
+        throw err;
+      }
+      // If user exists but not active, we just update their password/name and send a new OTP
+      const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+      await User.updatePassword(email, hashed);
+      // Fall through to OTP generation
+    } else {
+      // Hash password
+      const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+
+      // Create user
+      await User.create({
+        name,
+        email,
+        password: hashed,
+        phone,
+        role,
+      });
     }
 
-    // Hash password
-    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await User.setOTP(email, otp, expires);
 
-    // Create user
-    const userId = await User.create({
-      name,
-      email,
-      password: hashed,
-      phone,
-      role,
+    // Send email
+    const sendEmail = require("../utils/sendEmail");
+    await sendEmail({
+      to: email,
+      subject: "Qrave Verification OTP",
+      text: `Your verification code is ${otp}. It expires in 10 minutes.`,
+      html: `<p>Your verification code is <b>${otp}</b>. It expires in 10 minutes.</p>`,
     });
-    const user = await User.findById(userId);
 
-    // Generate token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
-    );
-
-    return { user, token };
+    return { message: "OTP sent for verification" };
   },
 
   async login({ email, password }) {
@@ -100,6 +112,10 @@ const authService = {
     const user = await User.findByEmail(email);
     if (!user) return null;
 
+    // Activate user after verification
+    await User.updateStatus(user.id, true);
+    await User.clearOTP(email);
+
     // Generate token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
@@ -109,7 +125,7 @@ const authService = {
 
     // Remove password from response
     const { password: _, ...safeUser } = user;
-    return { user: safeUser, token };
+    return { user: { ...safeUser, is_active: 1 }, token };
   },
 
   async resetPassword(email, otp, newPassword) {
