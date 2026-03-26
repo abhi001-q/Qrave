@@ -49,7 +49,7 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Health Check
+// Health & Diagnostic Checks
 app.get('/ping', async (req, res) => {
   try {
     const pool = require('./config/db');
@@ -57,6 +57,25 @@ app.get('/ping', async (req, res) => {
     res.json({ status: 'ok', db: 'connected', time: new Date() });
   } catch (err) {
     res.status(500).json({ status: 'error', db: 'disconnected', message: err.message });
+  }
+});
+
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const sendEmail = require('./utils/sendEmail');
+    await sendEmail({
+      to: process.env.EMAIL_USER,
+      subject: 'Qrave Diagnostic Test',
+      text: 'If you see this, your email service is working perfectly!'
+    });
+    res.json({ status: 'success', message: `Test email sent to ${process.env.EMAIL_USER}` });
+  } catch (err) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: err.message,
+      code: err.code,
+      hint: 'Verify EMAIL_PASS (no spaces) and EMAIL_USER on Render'
+    });
   }
 });
 
