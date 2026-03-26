@@ -4,12 +4,51 @@ import api from "../services/api";
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 1;
 
   useEffect(() => {
-    api.get("/orders/my-orders")
-      .then(res => setOrders(res.data.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const fetchOrders = async () => {
+      try {
+        let allOrders = [];
+        
+        // 1. Fetch authenticated orders
+        try {
+          const res = await api.get("/orders/my-orders");
+          if (res.data.success) {
+            allOrders = [...res.data.data];
+          }
+        } catch (err) {
+          console.log("Not logged in or session expired - skipping user orders");
+        }
+
+        // 2. Fetch guest orders from localStorage
+        const guestOrderIds = JSON.parse(localStorage.getItem("guestOrders") || "[]");
+        if (guestOrderIds.length > 0) {
+          const guestPromises = guestOrderIds.map(id => 
+            api.get(`/orders/${id}`).catch(() => null)
+          );
+          const guestResponses = await Promise.all(guestPromises);
+          const guestDetails = guestResponses
+            .filter(r => r && r.data && r.data.success)
+            .map(r => r.data.data);
+          
+          allOrders = [...allOrders, ...guestDetails];
+        }
+
+        // 3. De-duplicate and sort
+        const uniqueOrders = Array.from(new Map(allOrders.map(o => [o.id, o])).values());
+        uniqueOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        setOrders(uniqueOrders);
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
   const getStatusInfo = (status) => {
@@ -25,23 +64,33 @@ const Orders = () => {
     return mapping[status] || { label: status, color: "bg-slate-100 text-slate-600", icon: "help" };
   };
 
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  const currentOrders = orders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
+
   if (loading) return <div className="p-8 text-center text-primary font-black animate-pulse">Loading culinary journey...</div>;
 
   return (
-    <div className="p-6 space-y-10">
+    <div className="p-6 space-y-10 pb-32">
       {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-primary shadow-sm">
-          <span className="material-symbols-outlined font-black">receipt_long</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-primary shadow-sm">
+            <span className="material-symbols-outlined font-black">receipt_long</span>
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tighter">My Orders</h2>
+            <p className="text-slate-400 font-medium">History ({orders.length})</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter">My Orders</h2>
-          <p className="text-slate-400 font-medium">Your culinary history with Qrave.</p>
-        </div>
+        {totalPages > 1 && (
+          <div className="bg-slate-100 px-4 py-2 rounded-2xl">
+            <span className="text-xs font-black text-slate-500">{currentPage} of {totalPages}</span>
+          </div>
+        )}
       </div>
 
       <div className="space-y-6">
-        {orders.map((order) => {
+        {currentOrders.map((order) => {
           const statusInfo = getStatusInfo(order.status);
           return (
             <div key={order.id} className="bg-orange-50/50 rounded-[3rem] p-8 space-y-8 border-2 border-white shadow-premium animate-slide-up">
@@ -105,14 +154,14 @@ const Orders = () => {
             </div>
 
             {/* Delivery Status */}
-            <div className="bg-orange-100/50 rounded-[2.5rem] p-6 flex items-center justify-between border border-orange-100">
+            <div className="bg-orange-100/50 rounded-[3rem] p-6 flex items-center justify-between border border-orange-100">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm">
                   <span className="material-symbols-outlined font-black">{statusInfo.icon}</span>
                 </div>
                 <div className="space-y-0.5">
                   <p className="font-black text-slate-800 text-sm">
-                    {order.table_number ? `Dining at Table ${order.table_number}` : "Home Delivery"}
+                    {order.table_number ? `Dining at Table T-${order.table_number}` : "Home Delivery"}
                   </p>
                   <p className="text-[10px] text-slate-400 font-medium">
                     {order.status === 'PENDING' && "Waiting for kitchen to accept..."}
@@ -127,8 +176,33 @@ const Orders = () => {
               <span className="material-symbols-outlined text-primary">chevron_right</span>
             </div>
           </div>
-        );
-      })}
+          );
+        })}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between gap-4 pt-4">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`flex-1 h-14 rounded-3xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest transition-all ${
+                currentPage === 1 ? 'bg-slate-50 text-slate-300' : 'bg-white text-slate-600 shadow-sm border border-slate-100 active:scale-95'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">chevron_left</span>
+              Prev
+            </button>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`flex-1 h-14 rounded-3xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest transition-all ${
+                currentPage === totalPages ? 'bg-slate-50 text-slate-300' : 'bg-primary text-white shadow-lg active:scale-95'
+              }`}
+            >
+              Next
+              <span className="material-symbols-outlined text-base">chevron_right</span>
+            </button>
+          </div>
+        )}
 
         {orders.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[3rem] border border-slate-50 shadow-sm">
@@ -140,5 +214,6 @@ const Orders = () => {
     </div>
   );
 };
+;
 
 export default Orders;

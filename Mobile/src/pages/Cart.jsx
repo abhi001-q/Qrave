@@ -58,6 +58,13 @@ const Cart = () => {
       
       const orderId = res.data.data.id;
 
+      // Guest tracking: save orderId to localStorage
+      const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
+      if (!guestOrders.includes(orderId)) {
+        guestOrders.push(orderId);
+        localStorage.setItem("guestOrders", JSON.stringify(guestOrders));
+      }
+
       if (paymentMethod === "eSewa") {
         const timestamp = Date.now();
         const transaction_uuid = `QRV-${orderId}-${timestamp}`;

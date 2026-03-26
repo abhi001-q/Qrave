@@ -5,8 +5,7 @@ const MobileLayout = ({ children }) => {
   const location = useLocation();
 
   const navItems = [
-    { icon: "home", label: "Home", path: "/" },
-    { icon: "menu_book", label: "Menu", path: "/menu" },
+    { icon: "menu_book", label: "Menu", path: "/" },
     { icon: "shopping_basket", label: "Cart", path: "/cart" },
     { icon: "receipt_long", label: "Orders", path: "/orders" },
   ];
