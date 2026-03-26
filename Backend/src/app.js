@@ -32,25 +32,21 @@ if (process.env.CLIENT_URL) {
   allowedOrigins.push(...envOrigins.filter(url => url));
 }
 
-// Global CORS - placed as high as possible
+// Global CORS - temporarily permissive to identify if logic or environment is blocking
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes(origin + '/')) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS Warning: Origin ${origin} is not allowed. Check allowedOrigins in app.js.`);
-      callback(new Error('Not allowed by CORS'));
-    }
+    console.log('--- Incoming Request Origin:', origin);
+    // For now, allow everything but log the origin so we can add it later
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Potential fix for Render's extra security
+}));
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));

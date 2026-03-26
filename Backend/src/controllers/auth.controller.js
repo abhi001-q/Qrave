@@ -54,7 +54,7 @@ exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return sendError(res, 400, "Email is required");
     await authService.forgotPassword(email);
-    sendSuccess(res, 200, null, "OTP sent to your email");
+    sendSuccess(res, 200, { email, status: "sent" }, "OTP sent to your email");
   } catch (err) {
     // Log the full error for debugging
     console.error("Forgot Password Error:", err);

@@ -10,5 +10,12 @@ module.exports = (err, req, res, next) => {
   
   console.error('❌ Error:', err.message);
   const status = err.status || 500;
-  sendError(res, status, err.message || 'Internal Server Error');
+  
+  // Return detailed error in response for debugging
+  res.status(status).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+    error: process.env.NODE_ENV === 'production' ? {} : err.stack,
+    hint: 'Check Render logs for full details'
+  });
 };
