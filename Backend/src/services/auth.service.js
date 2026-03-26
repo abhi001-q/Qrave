@@ -37,15 +37,13 @@ const authService = {
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     await User.setOTP(email, otp, expires);
 
-    // Send email (NON-BLOCKING to avoid CORS/Proxy timeouts)
+    // Send email (BLOCKING - so user gets real error if email fails)
     const sendEmail = require("../utils/sendEmail");
-    sendEmail({
+    await sendEmail({
       to: email,
       subject: "Qrave Verification OTP",
       text: `Your verification code is ${otp}. It expires in 10 minutes.`,
       html: `<p>Your verification code is <b>${otp}</b>. It expires in 10 minutes.</p>`,
-    }).catch(err => {
-      console.error("Delayed Email Error (Register):", err.message);
     });
 
     return { message: "OTP sent for verification" };
@@ -97,15 +95,13 @@ const authService = {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     await User.setOTP(email, otp, expires);
-    // Send email (NON-BLOCKING)
+    // Send email (BLOCKING - so user gets real error if email fails)
     const sendEmail = require("../utils/sendEmail");
-    sendEmail({
+    await sendEmail({
       to: email,
       subject: "Qrave Password Reset OTP",
       text: `Your OTP is ${otp}. It expires in 10 minutes.`,
       html: `<p>Your OTP is <b>${otp}</b>. It expires in 10 minutes.</p>`,
-    }).catch(err => {
-      console.error("Delayed Email Error (ForgotPass):", err.message);
     });
   },
 
