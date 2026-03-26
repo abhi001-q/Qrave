@@ -12,6 +12,19 @@ const Orders = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const getStatusInfo = (status) => {
+    const mapping = {
+      PENDING: { label: "Pending", color: "bg-slate-100 text-slate-600", icon: "schedule" },
+      PAID: { label: "Paid", color: "bg-emerald-100 text-emerald-600", icon: "payments" },
+      PREPARING: { label: "Preparing", color: "bg-blue-100 text-blue-600", icon: "cooking" },
+      READY: { label: "Ready", color: "bg-orange-100 text-orange-600", icon: "check_circle" },
+      OUT_FOR_DELIVERY: { label: "On Way", color: "bg-purple-100 text-purple-600", icon: "delivery_dining" },
+      DELIVERED: { label: "Delivered", color: "bg-green-100 text-green-600", icon: "verified" },
+      CANCELLED: { label: "Cancelled", color: "bg-red-100 text-red-600", icon: "cancel" },
+    };
+    return mapping[status] || { label: status, color: "bg-slate-100 text-slate-600", icon: "help" };
+  };
+
   if (loading) return <div className="p-8 text-center text-primary font-black animate-pulse">Loading culinary journey...</div>;
 
   return (
@@ -19,37 +32,39 @@ const Orders = () => {
       {/* Page Header */}
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-primary shadow-sm">
-          <span className="material-symbols-outlined font-black">check_circle</span>
+          <span className="material-symbols-outlined font-black">receipt_long</span>
         </div>
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Order Placed!</h2>
-          <p className="text-slate-400 font-medium">Your culinary journey has begun.</p>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tighter">My Orders</h2>
+          <p className="text-slate-400 font-medium">Your culinary history with Qrave.</p>
         </div>
       </div>
 
       <div className="space-y-6">
-        {orders.map((order) => (
-          <div key={order.id} className="bg-orange-50/50 rounded-[3rem] p-8 space-y-8 border-2 border-white shadow-premium animate-slide-up">
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="text-primary font-black text-2xl tracking-tighter">Qrave</h4>
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Culinary Curator</p>
+        {orders.map((order) => {
+          const statusInfo = getStatusInfo(order.status);
+          return (
+            <div key={order.id} className="bg-orange-50/50 rounded-[3rem] p-8 space-y-8 border-2 border-white shadow-premium animate-slide-up">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-primary font-black text-2xl tracking-tighter">Qrave</h4>
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Culinary Curator</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Order ID</p>
+                  <h4 className="font-black text-slate-800 text-lg">#QR-{order.id.toString().padStart(5, '0')}</h4>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Order ID</p>
-                <h4 className="font-black text-slate-800 text-lg">#QR-{order.id.toString().padStart(5, '0')}</h4>
-              </div>
-            </div>
 
-            <div className="flex justify-between items-center bg-white/50 p-4 rounded-2xl border border-white">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Date</p>
-                <p className="font-black text-slate-800">{new Date(order.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              <div className="flex justify-between items-center bg-white/50 p-4 rounded-2xl border border-white">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Date</p>
+                  <p className="font-black text-slate-800">{new Date(order.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusInfo.color}`}>
+                  {statusInfo.label}
+                </span>
               </div>
-              <span className="bg-emerald-100 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
-                PAID ONLINE
-              </span>
-            </div>
 
             {/* Receipt Summary Card */}
             <div className="bg-white rounded-[2.5rem] p-8 shadow-card border border-white space-y-6">
@@ -93,17 +108,27 @@ const Orders = () => {
             <div className="bg-orange-100/50 rounded-[2.5rem] p-6 flex items-center justify-between border border-orange-100">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm">
-                  <span className="material-symbols-outlined font-black">delivery_dining</span>
+                  <span className="material-symbols-outlined font-black">{statusInfo.icon}</span>
                 </div>
                 <div className="space-y-0.5">
-                  <p className="font-black text-slate-800 text-sm">Delivering to Table {order.table_number}</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Chef is preparing your magic...</p>
+                  <p className="font-black text-slate-800 text-sm">
+                    {order.table_number ? `Dining at Table ${order.table_number}` : "Home Delivery"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-medium">
+                    {order.status === 'PENDING' && "Waiting for kitchen to accept..."}
+                    {order.status === 'PAID' && "Payment verified, starting prep!"}
+                    {order.status === 'PREPARING' && "Chef is working their magic..."}
+                    {order.status === 'READY' && "Your order is ready!"}
+                    {order.status === 'OUT_FOR_DELIVERY' && "Rider is on the way!"}
+                    {order.status === 'DELIVERED' && "Enjoy your meal!"}
+                  </p>
                 </div>
               </div>
               <span className="material-symbols-outlined text-primary">chevron_right</span>
             </div>
           </div>
-        ))}
+        );
+      })}
 
         {orders.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[3rem] border border-slate-50 shadow-sm">

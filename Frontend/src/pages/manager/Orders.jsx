@@ -75,14 +75,17 @@ export default function Orders() {
              <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Active Orders</span>
           </div>
           <span className="text-2xl font-black text-purple-600 tabular-nums">
-            {orders.filter(o => o.status !== "DELIVERED").length}
+            {orders.filter(o => !["DELIVERED", "CANCELLED"].includes(o.status)).length}
           </span>
         </div>
       </div>
 
       <div className="flex-1 overflow-x-auto custom-scrollbar-h pb-8 flex gap-8 snap-x p-1">
         {columns.map(col => {
-          const columnOrders = orders.filter(o => o.status === col.id);
+          const columnOrders = orders.filter(o => {
+            if (col.id === "PENDING") return o.status === "PENDING" || o.status === "PAID";
+            return o.status === col.id;
+          });
           
           return (
             <div key={col.id} className="w-[340px] flex-shrink-0 flex flex-col snap-start">
@@ -107,6 +110,11 @@ export default function Orders() {
                            <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${order.type === 'Delivery' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
                              {order.type}
                            </span>
+                           {order.status === "PAID" && (
+                             <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-emerald-500 text-white animate-pulse">
+                               PAID
+                             </span>
+                           )}
                          </div>
                          <div className="flex items-center gap-1.5 min-h-[14px]">
                             {order.status === 'READY' && order.type === 'Delivery' && (

@@ -49,18 +49,32 @@ exports.getUserOrders = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.findAllAsManager();
-    const formatted = orders.map(o => ({
-      id: o.id.toString(),
-      table: o.table_number || o.table_id,
-      status: (o.status || 'PENDING').toUpperCase(),
-      items: o.items_count || 0,
-      total: parseFloat(o.total_amount),
-      time: new Date(o.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-      type: o.order_type || o.orderType || 'Dine-in',
-      customer: (o.order_type || o.orderType) === 'Delivery' 
-        ? { name: o.customer_name || 'Guest', phone: '', address: o.delivery_location || 'N/A' } 
-        : null
-    }));
+    const formatted = orders.map(o => {
+      let itemsCount = 0;
+      try {
+        const itemsList = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
+        itemsCount = itemsList.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      } catch (e) {
+        console.error("Error parsing items for count:", e);
+      }
+
+      const dateObj = new Date(o.created_at);
+      const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+      return {
+        id: o.id.toString(),
+        table: o.table_number || o.table_id,
+        status: (o.status || 'PENDING').toUpperCase(),
+        items: itemsCount,
+        total: parseFloat(o.total_amount),
+        time: `${dateStr} • ${timeStr}`,
+        type: o.order_type || o.orderType || 'Dine-in',
+        customer: (o.order_type || o.orderType) === 'Delivery' 
+          ? { name: o.customer_name || 'Guest', phone: '', address: o.delivery_location || 'N/A' } 
+          : null
+      };
+    });
     sendSuccess(res, 200, formatted);
   } catch (err) {
     sendError(res, 500, err.message);

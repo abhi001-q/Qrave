@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import { toast } from "react-toastify";
 
 const Home = () => {
   const [categories] = useState(["All", "Burger", "Pizza", "Drinks", "Bowls"]);
@@ -34,6 +35,7 @@ const Home = () => {
     }
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("cartUpdated"));
+    toast.success(`${item.title || item.name} added to cart!`);
   };
 
   return (

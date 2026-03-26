@@ -9,20 +9,29 @@ export default function BillSection() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 2;
   const printRef = useRef();
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 10000); // Polling for new ready orders
+    const interval = setInterval(fetchOrders, 10000); 
     return () => clearInterval(interval);
-  }, []);
+  }, [showHistory]);
 
   const fetchOrders = async () => {
     try {
       const allOrders = await orderService.getAllAsManager();
-      // Filter for orders that are READY for billing
-      const ready = (allOrders || []).filter(o => o.status === "READY");
-      setOrders(ready);
+      if (showHistory) {
+        // Show last 50 settled or paid orders
+        const history = (allOrders || []).filter(o => ["DELIVERED", "PAID"].includes(o.status));
+        setOrders(history.slice(0, 50));
+      } else {
+        // Filter for orders that are READY for billing
+        const ready = (allOrders || []).filter(o => o.status === "READY");
+        setOrders(ready);
+      }
     } catch (err) {
       console.error("Failed to fetch billing orders", err);
     } finally {
@@ -62,6 +71,16 @@ export default function BillSection() {
     (o.table && o.table.toString().includes(searchTerm))
   );
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, showHistory]);
+
   const calculateSubtotal = () => {
     if (!orderDetails?.items) return 0;
     return orderDetails.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -75,14 +94,30 @@ export default function BillSection() {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
             Billing <span className="text-purple-600">Terminal</span>
           </h1>
-          <p className="text-slate-500 mt-2 font-medium">Finalize and settle active table orders.</p>
+          <p className="text-slate-500 mt-2 font-medium">
+            {showHistory ? "View and re-print settled order history." : "Finalize and settle active table orders."}
+          </p>
         </div>
 
         <div className="bg-white border border-slate-100 rounded-[40px] shadow-sm overflow-hidden flex-1 flex flex-col min-h-[500px]">
           <div className="p-8 border-b border-slate-50 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-black text-slate-900 uppercase tracking-widest text-xs">Ready for Settle</h2>
-              <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-[10px] font-black">{filteredOrders.length}</span>
+              <h2 className="font-black text-slate-900 uppercase tracking-widest text-xs">
+                {showHistory ? "Settled History" : "Ready for Settle"}
+              </h2>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => { setShowHistory(!showHistory); setSelectedOrder(null); setOrderDetails(null); }}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                    showHistory 
+                      ? 'bg-purple-600 text-white border-purple-600' 
+                      : 'bg-white text-slate-400 border-slate-100 hover:border-purple-200'
+                  }`}
+                >
+                  {showHistory ? "Show Live" : "Show History"}
+                </button>
+                <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-[10px] font-black">{filteredOrders.length}</span>
+              </div>
             </div>
             
             {/* Search Bar */}
@@ -104,10 +139,10 @@ export default function BillSection() {
                   <div className="w-8 h-8 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin"></div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading orders...</p>
                </div>
-            ) : filteredOrders.length === 0 ? (
+            ) : currentOrders.length === 0 ? (
               <div className="text-center py-20 text-slate-400 font-bold text-sm">No match found.</div>
             ) : (
-              filteredOrders.map(order => (
+              currentOrders.map(order => (
                 <div 
                   key={order.id} 
                   onClick={() => fetchOrderDetails(order.id)}
@@ -136,6 +171,30 @@ export default function BillSection() {
               ))
             )}
           </div>
+
+          {totalPages > 1 && (
+            <div className="px-8 py-4 border-t border-slate-50 flex items-center justify-between gap-4 flex-shrink-0 bg-white">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-slate-100 text-slate-400 hover:border-purple-200 hover:text-purple-600 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+                Prev
+              </button>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-slate-100 text-slate-400 hover:border-purple-200 hover:text-purple-600 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                Next
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -173,8 +232,14 @@ export default function BillSection() {
                     <span className="text-3xl font-black text-slate-900 tracking-tighter">Qrave</span>
                   </div>
                   <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Premium Dining Experience</p>
+
+                  {(isPaid || orderDetails.status === 'PAID' || orderDetails.status === 'DELIVERED') && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none z-0 opacity-[0.07] select-none">
+                      <h1 className="text-[12rem] font-black text-green-600 border-[20px] border-green-600 px-12 rounded-[60px] uppercase tracking-tighter">PAID</h1>
+                    </div>
+                  )}
                   
-                  <div className="mt-8 flex justify-between items-end border-b-2 border-dashed border-slate-100 pb-6">
+                  <div className="mt-8 flex justify-between items-end border-b-2 border-dashed border-slate-100 pb-6 relative z-10">
                      <div className="text-left">
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Receipt Number</p>
                         <p className="text-base font-black text-slate-900 tracking-tight">#{orderDetails.id}</p>
@@ -190,7 +255,7 @@ export default function BillSection() {
                   </div>
                </div>
 
-               <div className="flex-1 mb-8">
+               <div className="flex-1 mb-8 relative z-10">
                   <div className="flex mb-4 text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 pb-2">
                      <span className="flex-1">Description</span>
                      <span className="w-16 text-center">Qty</span>
@@ -239,7 +304,7 @@ export default function BillSection() {
                </div>
             </div>
 
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex ml-60 items-center gap-4 px-8 py-6 bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.1)] rounded-[32px] print:hidden z-10 transition-all hover:shadow-2xl hover:-translate-y-1 action-bar-floating">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 px-8 py-6 bg-white/80 backdrop-blur-xl border border-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.1)] rounded-[32px] print:hidden z-10 transition-all hover:shadow-2xl hover:-translate-y-1 action-bar-floating">
                <button 
                 onClick={() => { setSelectedOrder(null); setOrderDetails(null); }}
                 className="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center justify-center"

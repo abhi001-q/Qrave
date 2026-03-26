@@ -7,6 +7,8 @@ import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </MobileLayout>
+        <ToastContainer position="top-center" autoClose={2000} hideProgressBar />
       </AuthProvider>
     </Router>
   );
