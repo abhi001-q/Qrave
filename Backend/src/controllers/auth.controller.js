@@ -18,7 +18,12 @@ exports.register = async (req, res) => {
     });
     sendSuccess(res, 201, data, "Registration successful");
   } catch (err) {
-    sendError(res, err.status || 500, err.message);
+    console.error("Registration Error:", err);
+    let message = err.message || "Internal Server Error";
+    if (message.includes('535') || message.includes('authentication')) {
+      message = "Account created, but OTP email failed. Please fix EMAIL_PASS on Render. Error: " + message;
+    }
+    sendError(res, err.status || 500, message);
   }
 };
 

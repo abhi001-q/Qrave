@@ -64,17 +64,25 @@ app.get('/api/test-email', async (req, res) => {
   try {
     const sendEmail = require('./utils/sendEmail');
     await sendEmail({
-      to: process.env.EMAIL_USER,
-      subject: 'Qrave Diagnostic Test',
-      text: 'If you see this, your email service is working perfectly!'
+      to: "abhishek987ff@gmail.com",
+      subject: "Qrave SMTP Test",
+      text: "If you see this, SMTP is working perfectly on Render!",
     });
-    res.json({ status: 'success', message: `Test email sent to ${process.env.EMAIL_USER}` });
+    res.json({ 
+      success: true, 
+      message: "SMTP is WORKING!",
+      env_check: {
+        user: process.env.EMAIL_USER,
+        pass_len: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0
+      }
+    });
   } catch (err) {
     res.status(500).json({ 
-      status: 'error', 
-      message: err.message,
+      success: false, 
+      message: "SMTP TEST FAILED",
+      error: err.message,
       code: err.code,
-      hint: 'Verify EMAIL_PASS (no spaces) and EMAIL_USER on Render'
+      troubleshoot: "1. Use a 16-char App Password. 2. NO SPACES in EMAIL_PASS. 3. Check Gmail security alerts."
     });
   }
 });
