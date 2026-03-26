@@ -57,6 +57,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static('uploads'));
 
 // ── Routes ───────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: '🚀 Qrave Backend API is running!',
+    docs: 'https://github.com/abhi001-q/Qrave',
+    hint: 'Use /api prefix for API calls (e.g., /api/menu)'
+  });
+});
+
 app.use('/api/auth',     authRoutes);
 app.use('/api/menu',     menuRoutes);
 app.use('/api/categories', categoryRoutes);
