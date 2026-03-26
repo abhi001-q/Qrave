@@ -40,15 +40,24 @@ async function sendEmail({ to, subject, text, html }) {
 
   try {
     console.log(`Attempting to send email to: ${to}...`);
-    const info = await transporter.sendMail(mailOptions);
+    
+    // Create a timeout promise (8 seconds)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Email sending timed out after 8 seconds')), 8000);
+    });
+
+    // Race the sendMail against the timeout
+    const info = await Promise.race([
+      transporter.sendMail(mailOptions),
+      timeoutPromise
+    ]);
+
     console.log("Email sent successfully:", info.messageId);
     return info;
   } catch (error) {
     console.error("SMTP Error Details:");
     console.error("- Message:", error.message);
     console.error("- Code:", error.code);
-    console.error("- Command:", error.command);
-    console.error("- Response:", error.response);
     throw error;
   }
 }
