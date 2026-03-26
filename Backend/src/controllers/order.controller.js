@@ -76,7 +76,7 @@ exports.updateStatus = async (req, res) => {
     fs.appendFileSync(debugLog, logMsg);
     
     if (!status) return sendError(res, 400, 'Status is required');
-    await Order.updateStatus(id, status.toLowerCase());
+    await Order.updateStatus(id, status.toUpperCase());
     sendSuccess(res, 200, null, "Order status updated");
   } catch (err) {
     const errMsg = `[${new Date().toISOString()}] ERROR: ${err.stack}\n`;
@@ -94,6 +94,27 @@ exports.updateTransactionId = async (req, res) => {
     
     await Order.updateTransactionId(id, transaction_uuid);
     sendSuccess(res, 200, null, "Order transaction UUID updated");
+  } catch (err) {
+    sendError(res, 500, err.message);
+  }
+};
+
+exports.getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) return sendError(res, 404, "Order not found");
+    
+    // Format items if they are stored as JSON string
+    if (order.items && typeof order.items === 'string') {
+      try {
+        order.items = JSON.parse(order.items);
+      } catch (e) {
+        console.error("Error parsing order items:", e);
+      }
+    }
+    
+    sendSuccess(res, 200, order);
   } catch (err) {
     sendError(res, 500, err.message);
   }

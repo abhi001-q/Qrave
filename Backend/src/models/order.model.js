@@ -73,6 +73,18 @@ const Order = {
        ORDER BY o.created_at DESC`
     );
     return rows;
+  },
+
+  async findById(id) {
+    const [rows] = await pool.query(
+      `SELECT o.*, t.table_number, u.name as customer_name, u.phone as customer_phone
+       FROM orders o 
+       LEFT JOIN tables t ON o.table_id = t.id 
+       LEFT JOIN users u ON o.user_id = u.id
+       WHERE o.id = ?`,
+      [id]
+    );
+    return rows.length > 0 ? rows[0] : null;
   }
 };
 

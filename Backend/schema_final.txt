@@ -1,0 +1,1 @@
+STATUS COLUMN FULL TYPE: enum('pending','PAID','preparing','out_for_delivery','delivered','cancelled')
