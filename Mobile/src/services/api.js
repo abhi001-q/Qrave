@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+let baseURL = import.meta.env.VITE_API_URL || "https://qrave-2.onrender.com/api";
 
 // Robustness: Ensure baseURL ends with /api
 if (baseURL && !baseURL.endsWith("/api")) {

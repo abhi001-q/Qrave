@@ -3,17 +3,32 @@ import api from "../services/api";
 import { toast } from "react-toastify";
 
 const Home = () => {
-  const [categories] = useState(["All", "Burger", "Pizza", "Drinks", "Bowls"]);
+  const [categories, setCategories] = useState(["All", "Burger", "Pizza", "Drinks", "Bowls"]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [menuItems, setMenuItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+    // 1. Fetch Menu
     api.get("/menu")
       .then(res => setMenuItems(res.data.data))
-      .catch(console.error)
+      .catch(err => {
+        console.error("Food Fetch Error:", err);
+        toast.error("Network error: Could not reach server.");
+      })
       .finally(() => setLoading(false));
+
+    // 2. Fetch Categories (optional but better)
+    api.get("/categories")
+      .then(res => {
+        if (res.data.data) {
+          const names = res.data.data.map(c => c.name);
+          setCategories(["All", ...names]);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const filteredItems = menuItems.filter(item => {
