@@ -50,7 +50,15 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health Check
-app.get('/ping', (req, res) => res.send('pong'));
+app.get('/ping', async (req, res) => {
+  try {
+    const pool = require('./config/db');
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected', time: new Date() });
+  } catch (err) {
+    res.status(500).json({ status: 'error', db: 'disconnected', message: err.message });
+  }
+});
 
 // Static uploads (bill PDFs)
 app.use('/uploads', express.static('uploads'));
