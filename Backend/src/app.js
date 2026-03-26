@@ -32,25 +32,25 @@ if (process.env.CLIENT_URL) {
   allowedOrigins.push(...envOrigins.filter(url => url));
 }
 
-// Global CORS - temporarily permissive to identify if logic or environment is blocking
+// Global CORS - Extremely permissive for debugging
 app.use(cors({
-  origin: (origin, callback) => {
-    console.log('--- Incoming Request Origin:', origin);
-    // For now, allow everything but log the origin so we can add it later
-    callback(null, true);
-  },
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 app.use(helmet({
-  crossOriginResourcePolicy: false, // Potential fix for Render's extra security
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false
 }));
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Health Check
+app.get('/ping', (req, res) => res.send('pong'));
 
 // Static uploads (bill PDFs)
 app.use('/uploads', express.static('uploads'));
