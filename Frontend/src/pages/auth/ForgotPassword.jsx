@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../../services/api";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function ForgotPassword() {
     }
     setLoading(true);
     try {
-      await axios.post("/api/auth/forgot-password", { email });
+      await api.post("/auth/forgot-password", { email });
       setOtpSent(true);
       toast.success("OTP sent to your email!");
     } catch (error) {
@@ -35,7 +35,7 @@ export default function ForgotPassword() {
     }
     setLoading(true);
     try {
-      await axios.post("/api/auth/verify-otp", { email, otp });
+      await api.post("/auth/verify-otp", { email, otp });
       toast.success("OTP verified!");
       navigate("/reset-password", { state: { email } });
     } catch (error) {

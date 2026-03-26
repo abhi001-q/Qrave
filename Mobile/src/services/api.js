@@ -7,6 +7,11 @@ if (baseURL && !baseURL.endsWith("/api")) {
   baseURL = `${baseURL.replace(/\/+$/, "")}/api`;
 }
 
+// Production check: Warn if baseURL is relative or pointing to localhost/vercel
+if (import.meta.env.PROD && (baseURL.startsWith("http://localhost") || !baseURL.startsWith("http"))) {
+  console.warn("API Warning: baseURL might be misconfigured for production:", baseURL);
+}
+
 const api = axios.create({
   baseURL,
 });
