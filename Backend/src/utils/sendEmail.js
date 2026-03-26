@@ -1,15 +1,14 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     // Automatically strip spaces from App Passwords if present
     pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '',
   },
-  connectionTimeout: 10000, // 10 seconds timeout
+  debug: true,
+  logger: true
 });
 
 async function sendEmail({ to, subject, text, html }) {
@@ -17,6 +16,9 @@ async function sendEmail({ to, subject, text, html }) {
     console.error("CRITICAL ERROR: EMAIL_USER or EMAIL_PASS environment variables are missing!");
     throw new Error("Email service is not configured on the server.");
   }
+
+  // Debug log (can be seen in Render Logs)
+  console.log(`Email Service: Attempting to send from ${process.env.EMAIL_USER} to ${to}...`);
 
   const mailOptions = {
     from: `"Qrave Support" <${process.env.EMAIL_USER}>`,
