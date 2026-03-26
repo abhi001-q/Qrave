@@ -18,9 +18,7 @@ const errorHandler  = require('./middleware/errorHandler');
 
 const app = express();
 
-// ── Middleware ───────────────────────────────────────────────
-app.use(helmet());
-
+// ── CORS & Security ───────────────────────────────────────────
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
@@ -31,23 +29,28 @@ const allowedOrigins = [
 
 if (process.env.CLIENT_URL) {
   const envOrigins = process.env.CLIENT_URL.split(',').map(url => url.trim());
-  allowedOrigins.push(...envOrigins);
+  allowedOrigins.push(...envOrigins.filter(url => url));
 }
 
-app.use(cors({ 
+// Global CORS - placed as high as possible
+app.use(cors({
   origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Check for exact match or match from CLIENT_URL
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes(origin + '/')) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS Warning: Origin ${origin} is not allowed. Check allowedOrigins in app.js.`);
+      callback(new Error('Not allowed by CORS'));
     }
-    
-    // Error out if not allowed
-    callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(helmet());
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
