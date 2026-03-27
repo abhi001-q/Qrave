@@ -11,4 +11,5 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Force keep-alive to debug why it's exiting cleanly
+// Reload trigger: 2026-03-27T13:42:00
 setInterval(() => {}, 3600000);
