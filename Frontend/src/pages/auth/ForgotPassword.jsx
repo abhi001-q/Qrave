@@ -37,7 +37,7 @@ export default function ForgotPassword() {
     try {
       await api.post("/auth/verify-otp", { email, otp });
       toast.success("OTP verified!");
-      navigate("/reset-password", { state: { email } });
+      navigate("/reset-password", { state: { email, otp } });
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Invalid OTP. Please try again.",

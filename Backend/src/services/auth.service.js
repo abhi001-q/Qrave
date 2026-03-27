@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const { getOTPTemplate } = require("../utils/emailTemplates");
 
 const SALT_ROUNDS = 10;
 
@@ -43,7 +44,7 @@ const authService = {
       to: email,
       subject: "Qrave Verification OTP",
       text: `Your verification code is ${otp}. It expires in 10 minutes.`,
-      html: `<p>Your verification code is <b>${otp}</b>. It expires in 10 minutes.</p>`,
+      html: getOTPTemplate(otp, "Verification"),
     });
 
     return { message: "OTP sent for verification" };
@@ -101,7 +102,7 @@ const authService = {
       to: email,
       subject: "Qrave Password Reset OTP",
       text: `Your OTP is ${otp}. It expires in 10 minutes.`,
-      html: `<p>Your OTP is <b>${otp}</b>. It expires in 10 minutes.</p>`,
+      html: getOTPTemplate(otp, "Reset"),
     });
   },
 
@@ -114,7 +115,8 @@ const authService = {
 
     // Activate user after verification
     await User.updateStatus(user.id, true);
-    await User.clearOTP(email);
+    // DO NOT clear OTP here, let the final action (registration or reset) clear it
+    // await User.clearOTP(email); 
 
     // Generate token
     const token = jwt.sign(

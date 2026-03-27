@@ -7,7 +7,7 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(location.state?.otp || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
