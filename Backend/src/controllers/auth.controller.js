@@ -18,12 +18,7 @@ exports.register = async (req, res) => {
     });
     sendSuccess(res, 201, data, "Registration successful");
   } catch (err) {
-    console.error("Registration Error:", err);
-    let message = err.message || "Internal Server Error";
-    if (message.includes('535') || message.includes('authentication')) {
-      message = "Account created, but OTP email failed. Please fix EMAIL_PASS on Render. Error: " + message;
-    }
-    sendError(res, err.status || 500, message);
+    sendError(res, err.status || 500, err.message);
   }
 };
 
@@ -59,7 +54,7 @@ exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return sendError(res, 400, "Email is required");
     await authService.forgotPassword(email);
-    sendSuccess(res, 200, { email, status: "sent" }, "OTP sent to your email");
+    sendSuccess(res, 200, null, "OTP sent to your email");
   } catch (err) {
     // Log the full error for debugging
     console.error("Forgot Password Error:", err);
@@ -72,9 +67,9 @@ exports.verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp)
       return sendError(res, 400, "Email and OTP are required");
-    const data = await authService.verifyOtp(email, otp);
-    if (!data) return sendError(res, 400, "Invalid or expired OTP");
-    sendSuccess(res, 200, data, "OTP verified");
+    const valid = await authService.verifyOtp(email, otp);
+    if (!valid) return sendError(res, 400, "Invalid or expired OTP");
+    sendSuccess(res, 200, null, "OTP verified");
   } catch (err) {
     sendError(res, err.status || 500, err.message);
   }
