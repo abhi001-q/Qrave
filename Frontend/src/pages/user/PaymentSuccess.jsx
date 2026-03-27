@@ -27,7 +27,6 @@ export default function PaymentSuccess() {
 
       // 1. Verify locally with signature
       let isValid = paymentService.verifySignature(response);
-      console.log("Signature Validation result:", isValid);
 
       // 2. Extra verification: Check status field
       if (response.status !== "COMPLETE") {
@@ -39,16 +38,13 @@ export default function PaymentSuccess() {
         // Extract numeric order ID from transaction_uuid (format: QRV-id)
         const orderIdMatch = response.transaction_uuid.match(/\d+/);
         const orderId = orderIdMatch ? orderIdMatch[0] : response.transaction_uuid.replace("QRV-", "");
-        console.log("Processing Order:", orderId);
 
         // 3. Fallback: If signature failed, double check with Status API
         if (!isValid) {
-          console.log("Signature mismatch. Falling back to Status Check API...");
           // We can't easily call eSewa from client due to CORS, 
           // but we can trust the 'COMPLETE' status if the fields look sane
           // OR we just rely on the existing verifyPayment logic
           if (response.status === "COMPLETE") {
-             console.log("Trusting 'COMPLETE' status despite signature mismatch.");
              isValid = true;
           }
         }

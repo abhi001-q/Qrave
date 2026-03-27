@@ -36,14 +36,11 @@ export const paymentService = {
    */
   decodeResponse: (encodedData) => {
     try {
-      console.log("Raw eSewa Base64:", encodedData);
       // Safe Base64 decoding (handles URL-safe and standard Base64)
       const base64 = encodedData.replace(/-/g, '+').replace(/_/g, '/');
       const decodedString = decodeURIComponent(atob(base64).split('').map(function(c) {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
-      
-      console.log("Decoded eSewa JSON:", decodedString);
       return JSON.parse(decodedString);
     } catch (e) {
       console.error("Failed to decode eSewa response:", e);
@@ -64,10 +61,6 @@ export const paymentService = {
         const { total_amount, transaction_uuid, product_code, signature } = response;
         // The signature in v2 success response is often computed with the same logic as the request
         const generated = paymentService.generateSignature(total_amount, transaction_uuid, product_code);
-        
-        console.log("Verifying eSewa Signature...");
-        console.log("Expected (Generated):", generated);
-        console.log("Actual (from Response):", signature);
         
         return generated === signature;
     } catch (e) {

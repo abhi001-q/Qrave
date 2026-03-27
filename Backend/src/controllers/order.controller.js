@@ -7,7 +7,6 @@ const debugLog = path.join(__dirname, '../../debug.log');
 exports.createOrder = async (req, res) => {
   try {
     let { tableId, totalAmount, items, orderType, paymentMethod, delivery_location, delivery_zip } = req.body;
-    console.log("---- INCOMING ORDER PAYLOAD ----", req.body);
     
     // Normalize orderType for ENUM('Dine-in', 'Delivery')
     if (orderType === "Dine In") orderType = "Dine-in";

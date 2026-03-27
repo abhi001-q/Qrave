@@ -26,8 +26,7 @@ async function sendEmail({ to, subject, text, html }) {
     throw new Error("Email service is not configured on the server.");
   }
 
-  // Debug log (can be seen in Render Logs)
-  console.log(`Email Service: Attempting to send from ${process.env.EMAIL_USER} to ${to}...`);
+  // Internal logs removed
 
   const mailOptions = {
     from: `"Qrave Support" <${process.env.EMAIL_USER}>`,
@@ -38,8 +37,8 @@ async function sendEmail({ to, subject, text, html }) {
   };
 
   try {
-    console.log(`Attempting to send email to: ${to}...`);
     
+
     // Create a timeout promise (8 seconds)
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Email sending timed out after 8 seconds')), 8000);
@@ -51,7 +50,6 @@ async function sendEmail({ to, subject, text, html }) {
       timeoutPromise
     ]);
 
-    console.log("Email sent successfully:", info.messageId);
     return info;
   } catch (error) {
     console.error("SMTP Error Details:");
